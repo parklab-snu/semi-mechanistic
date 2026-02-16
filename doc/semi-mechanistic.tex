@@ -1,0 +1,244 @@
+\documentclass[12pt]{article}
+% \usepackage[top=1in,left=1in, right = 1in, footskip=1in]{geometry}
+\usepackage[top=1in,footskip=1in]{geometry}
+
+\usepackage{graphicx}
+\usepackage{xspace}
+%\usepackage{adjustbox}
+
+\usepackage{multirow}
+\usepackage{booktabs}
+
+\usepackage{pdflscape}
+
+\usepackage{grffile}
+
+\newcommand{\comment}{\showcomment}
+%% \newcommand{\comment}{\nocomment}
+
+\newcommand{\showcomment}[3]{\textcolor{#1}{\textbf{[#2: }\textsl{#3}\textbf{]}}}
+\newcommand{\nocomment}[3]{}
+
+\newcommand{\jd}[1]{\comment{cyan}{JD}{#1}}
+\newcommand{\swp}[1]{\comment{magenta}{SWP}{#1}}
+\newcommand{\bmb}[1]{\comment{blue}{BMB}{#1}}
+\newcommand{\djde}[1]{\comment{red}{DJDE}{#1}}
+
+\newcommand{\eref}[1]{Eq.~(\ref{eq:#1})}
+\newcommand{\fref}[1]{Fig.~\ref{fig:#1}}
+\newcommand{\Fref}[1]{Fig.~\ref{fig:#1}}
+\newcommand{\sref}[1]{Sec.~\ref{#1}}
+\newcommand{\frange}[2]{Fig.~\ref{fig:#1}--\ref{fig:#2}}
+\newcommand{\tref}[1]{Table~\ref{tab:#1}}
+\newcommand{\tlab}[1]{\label{tab:#1}}
+\newcommand{\seminar}{SE\mbox{$^m$}I\mbox{$^n$}R}
+
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage[utf8]{inputenc} % make sure fancy dashes etc. don't get dropped
+
+\usepackage{lineno}
+\linenumbers
+
+\usepackage[pdfencoding=auto, psdextra]{hyperref}
+
+\usepackage{natbib}
+\bibliographystyle{unsrt}
+\date{\today}
+
+\usepackage{xspace}
+\newcommand*{\ie}{i.e.\@\xspace}
+
+\usepackage{color}
+
+\newcommand{\Rx}[1]{\ensuremath{{\mathcal R}_{#1}}\xspace} 
+\newcommand{\RR}{\ensuremath{{\mathcal R}}\xspace}
+\newcommand{\Rres}{\Rx{\mathrm{res}}}
+\newcommand{\Rinv}{\Rx{\mathrm{inv}}}
+\newcommand{\Rhat}{\ensuremath{{\hat\RR}}}
+\newcommand{\Rt}{\ensuremath{{\mathcal R}(t)}\xspace}
+\newcommand{\tsub}[2]{#1_{{\textrm{\tiny #2}}}}
+\newcommand{\dd}[1]{\ensuremath{\, \mathrm{d}#1}}
+\newcommand{\dtau}{\dd{\tau}}
+\newcommand{\dx}{\dd{x}}
+\newcommand{\dsigma}{\dd{\sigma}}
+
+\newcommand{\rx}[1]{\ensuremath{{r}_{#1}}\xspace} 
+\newcommand{\rres}{\rx{\mathrm{res}}}
+\newcommand{\rinv}{\rx{\mathrm{inv}}}
+
+\newcommand{\psymp}{\ensuremath{p}} %% primary symptom time
+\newcommand{\ssymp}{\ensuremath{s}} %% secondary symptom time
+\newcommand{\pinf}{\ensuremath{\alpha_1}} %% primary infection time
+\newcommand{\sinf}{\ensuremath{\alpha_2}} %% secondary infection time
+
+\newcommand{\psize}{{\mathcal P}} %% primary cohort size
+\newcommand{\ssize}{{\mathcal S}} %% secondary cohort size
+
+\newcommand{\gtime}{\tau_{\rm g}} %% generation interval
+\newcommand{\gdist}{g} %% generation-interval distribution
+\newcommand{\idist}{\ell} %% incubation-period distribution
+
+\newcommand{\total}{{\mathcal T}} %% total number of serial intervals
+
+\usepackage{lettrine}
+
+\newcommand{\dropcapfont}{\fontfamily{lmss}\bfseries\fontsize{26pt}{28pt}\selectfont}
+\newcommand{\dropcap}[1]{\lettrine[lines=2,lraise=0.05,findent=0.1em, nindent=0em]{{\dropcapfont{#1}}}{}}
+
+\begin{document}
+
+\begin{flushleft}{
+	\Large
+	\textbf\newline{
+  Inference and interpretation of long-term changes in infectious disease transmission using semi-mechanistic models
+	}
+}
+\newline
+\\
+Sang Woo Park\textsuperscript{1,*}, To be invited (Emily, Bjarke, Wakinyan, and who else?)
+\\
+\bigskip
+\textbf{1} School of Biological Sciences, Seoul National University, Seoul, Korea
+\bigskip
+
+*Corresponding author: sangwoopark@snu.ac.kr
+\end{flushleft}
+
+\section*{Abstract}
+
+\pagebreak
+
+\section*{Introduction}
+
+A fundamental aim in infectious disease dynamics research is characterizing how disease transmission rates change over time.
+For example, classical studies of endemic childhood infections, particularly measles, focused on estimating seasonal fluctuation in transmission rates driven by school term and climate effects.
+These efforts not only generated key insights into the drivers of epidemic dynamics but also established core methodological foundations \citep{bjornstad2002dynamics,grenfell2002dynamics,he2010plug,king2016statistical}.
+Yet transmission rates can also evolve over longer time scales, reflecting gradual shifts in host behavior, demography, socioeconomic factors, and environmental conditions.
+Compared with seasonal variation, however, these low-frequency changes have received far less attention, in part because they are more difficult to identify from incidence data and are often confounded with other slow-moving processes such as susceptible replenishment and vaccination \citep{hooker2011parameterizing}.
+
+Disruptions in disease transmission caused by COVID-19 nonpharmaceutical interventions also highlighted the similar need for new frameworks for estimating transmission rates that can vary flexibly across two different time scales:
+explaining these disruptions requires simultaneous estimation of seasonal transmission patterns and rapid changes in transmission rate reflecting intervention effects.
+To capture the impact of nonpharmaceutical interventions on disease transmission, some researchers have relied on known metrics of intervention strengths, such as mobility patterns \citep{park2024predicting2,howerton2025using} and stringency indices \citep{holmdahl2024differential}, whereas other have sought to directly estimate these impacts through various statistical methods \citep{bents2023modeling,sauteur2025global,nguyen2026dynamics}.
+Notably, models utilizing Bayesian inference have proven particularly useful for estimating flexible changes in transmission patterns, where statistical constraints through prior distributions can appropriately limit the variability in parameter estimates \citep{park2024predicting,nielsen2025complex,park2025interplay}.
+These methodological advances provide a basis for developing semi-mechanistic models that allow estimation of transmission rates across two different time scales, with potential applications beyond the context of COVID-19 interventions, but their estimability and generalizability have not yet been tested.
+Furthermore, the apparent discrepancy between the estimated intervention effects and observed changes in mobility patterns indicate potential challenges in interpreting parameter estimates from semi-mechanistic models \citep{park2024predicting}.
+
+Here, we present a semi-mechanistic framework for simultaneously estimating seasonal and long-term variation in disease transmission and investigate its estimability and interpretibility.
+We test the resulting framework against a 126-year long time series of smallpox deaths, which presents a computationally challenging example.
+
+\section*{Materials and Methods}
+
+\subsection*{Data}
+
+We use a weekly time series of smallpox deaths to test the ability of a semi-mechanistic model to infer long-term changes in disease transmission (Figure 1).
+The original data set spans from 1664 to 1930 and was digitized from London Bills of Mortality and the Registrar General’s Weekly Returns by \cite{krylova2020patterns}.
+Here, we consider mortality records between 1670 and 1795 to focus on the dynamics before the discovery of vaccination.
+Even in the absence of vaccination, an increase in variolation to protect against severe outcomes (Figure 1A) and a rapid increase in population sizes due to increasing births (Figure 1B,C) would have caused complex changes in transmission conditions over the 126-year period, which cannot be explained by traditional modeling approaches that only account for seasonal transmission forcing. 
+Data on population sizes and birth rates were obtained from the publicly available data set from \citep{krylova2020patterns}.
+Death rates were calculated to match increasing rates of population sizes:
+specifically, we calculated the difference between the weekly rate of population size increase and weekly  birth rate to obtain weekly death rates.
+
+\begin{figure}[!ht]
+\includegraphics[width=\textwidth]{../figure/figure_data.pdf}
+\caption{
+\textbf{Data}
+}
+\end{figure}
+
+\subsection*{Mathematical model}
+
+To focus on the feasibility of estimating long-term changes in transmission, we decided to use the simplest transmission model, namely the SIR model.
+Assuming density dependent transmission, the discrete time SIR model can be written as:
+\begin{align}
+\mathrm{FOI}(t) &= \beta(t) (I(t) + \omega) \\
+\Delta S(t) &= \left[1- \exp(-(\mathrm{FOI}(t) + d(t)) \Delta t )\right] S(t-\Delta t)\\
+N_{SI}(t) &= \frac{\mathrm{FOI}(t)\Delta S(t)}{\mathrm{FOI}(t) + d(t)} \\
+\Delta I(t) &= \left[1- \exp(-(\gamma + d(t)) \Delta t )\right] I(t-\Delta t)\\
+N_{IR}(t) &= \frac{\gamma \Delta I(t)}{\gamma + d(t)} \\
+S(t) &= S(t-\Delta t) + b(t) N - \Delta S(t) \\
+I(t) &= I(t-\Delta t) - \Delta I(t) + N_{SI}(t)
+\end{align}
+where $\mathrm{FOI}(t)$ represents the force of infection;
+$\beta(t)$ represents the transmission rate;
+$\omega$ represents the number of imported infections;
+$\gamma$ represents the recovery rate;
+$d(t)$ represents the death rate;
+and $b(t)$ represents the birth rate.
+The transmission rate is decomposed into a seasonal term $\tsub{\beta}{seas}(t)$ and a multiplicative time-varying transmission term $\delta(t)$:
+\begin{equation}
+\beta(t) = \frac{\tsub{\beta}{seas}(t) \delta(t)}{N_{1670}},
+\end{equation}
+where $N_{1670}$ represents the population size at the beginning of 1670, which is included to scale the $\tsub{\beta}{seas}(t)$.
+Previous studies have illustrated the feasibility of estimating $\delta(t)$ at different time scales by anchoring the seasonal term $\tsub{\beta}{seas}(t)$ to certain periods.
+For example, when inferring the impact of COVID-19 interventions, $\delta(t)$ was set to 1 during the pre-pandemic period and allowed to vary from 2020 onward, with change points defined at intervals ranging from one to four weeks \citep{park2024predicting,nielsen2025complex,park2025interplay}.
+Since we are interested in capturing long-term changes in transmission, we allow $\delta(t)$ to vary every year.
+
+\subsection*{Statistical inference and implementation}
+
+In order to simultaneously estimate $\tsub{\beta}{seas}(t)$ and $\delta(t)$ alongside other parameters and initial conditions, we need to appropriately constrain the parameter space.
+Otherwise, estimating 52 terms for $\tsub{\beta}{seas}(t)$ and 126 terms for $\delta(t)$ requires estimation of $>170$ parameters, which is more than an order of magnitude greater than the number of parameters that are estimated for a typical infecitous disease models.
+Bayesian inference, implemented via the Stan software, enables us to constrain the parameter space through prior distributions and allows for fast, efficient inference through state-of-art inferece algorithms \citep{carpenter2017stan}. 
+We first discuss our model parameterization, prior choices, and observation models used for fitting.
+Then, we describe our implementation in Stan.
+
+If we try to estimate all 52 terms of the seasonal term $\tsub{\beta}{seas}(t)$ separately, then the resulting transmission rate may not be realistic and difficult to interpret.
+Thus, to constrain the shape of the seasonal term $\tsub{\beta}{seas}(t)$ and allow for biological interpretation, we impose a cyclic, random-walk prior on a log scale \citep{park2025interplay}:
+\begin{align}
+\log\tsub{\beta}{seas}(t+1) &\sim \mathrm{Normal}(\log\tsub{\beta}{seas}(t), \tsub{\sigma}{seas}), \quad t=1,\dots,51  \\
+\log\tsub{\beta}{seas}(1) &\sim \mathrm{Normal}(\log\tsub{\beta}{seas}(52), \tsub{\sigma}{seas})
+\end{align}
+where the standard deviation $\tsub{\sigma}{seas}$ determines the smoothness of the seasonal transmission rate.
+Strong priors are imposed to constrain the parameter space for $\tsub{\sigma}{seas}$:
+\begin{equation}
+\tsub{\sigma}{seas} \sim \textrm{Half-Normal}(0, 0.01).
+\end{equation}
+We further impose an informative prior on $\tsub{\beta}{seas}(t)$, reflecting previously reported $\mathcal R_0$ values for smallpox transmission:
+\begin{equation}
+\log\tsub{\beta}{seas}(t) \sim \mathrm{Normal}(0.5, 0.1).
+\end{equation}
+Combined with the assumed recovery rate of $-\log(1-1/3)/\mathrm{weeks}$, which corresponds to a mean infectious period of 3 weeks, the prior distribution of the basic reproduction number has a median of 4.9 and a 95\% quantile of 4.1 to 6.0.
+
+For similar reasons as above, we also utilize random walk priors to model the multiplicative time-varying transmission term on a log scale: $\delta(t) = \exp(\epsilon(t))$.
+In order to reduce correlations in posterior distributions, we parameterized $\epsilon(t)$ by expression it as a sum of independent normal variables $z_\epsilon(t)$:
+\begin{align}
+z_\epsilon(t) &\sim \mathrm{Normal}(0, 1), \quad t = 1671, \dots, 1795 \\
+\sigma_\epsilon &\sim \textrm{Half-Normal}(0, 0.01)\\
+\epsilon(1670) &= 0\\
+\epsilon(t) &= \epsilon(t-1) + \sigma_\epsilon z_\epsilon, \quad t = 1671, \dots, 1795 \\
+\delta(t) &= \exp(\epsilon(t))
+\end{align}
+where $z_\epsilon(t)$ determines the smoothness of $\epsilon(t)$. By setting the initial $\epsilon(1670)$ to zero and imposing constraining priors on $\sigma_\epsilon$, this approach anchors the seasonal transmission term $\tsub{\beta}{seas}(t)$ to early periods and allow for slow variation in transmission rates over time.
+
+The model is fitted to time series data 
+
+\section*{Results}
+
+\begin{figure}[!ht]
+\includegraphics[width=\textwidth]{../figure/figure_stanfit.pdf}
+\caption{
+\textbf{Data}
+}
+\end{figure}
+
+\begin{figure}[!ht]
+\includegraphics[width=\textwidth]{../figure/figure_stanfit_sb.pdf}
+\caption{
+\textbf{Data}
+}
+\end{figure}
+
+\begin{figure}[!ht]
+\includegraphics[width=\textwidth]{../figure/figure_stanfit_sv.pdf}
+\caption{
+\textbf{Data}
+}
+\end{figure}
+
+\section*{Discussion}
+
+\bibliography{semi-mechanistic}
+
+\end{document}
