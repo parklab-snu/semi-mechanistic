@@ -133,9 +133,9 @@ We test the resulting framework against a 126-year long time series of smallpox 
 
 \subsection*{Data}
 
-We use a weekly time series of smallpox deaths to test the ability of a semi-mechanistic model to infer long-term changes in disease transmission (Figure 1).
+We used a weekly time series of smallpox deaths to test the ability of a semi-mechanistic model to infer long-term changes in disease transmission (Figure 1).
 The original data set spans from 1664 to 1930 and was digitized from London Bills of Mortality and the Registrar General’s Weekly Returns by \cite{krylova2020patterns}.
-Here, we consider mortality records between 1670 and 1795 to focus on the dynamics before the discovery of vaccination.
+Here, we considered mortality records between 1670 and 1795 to focus on the dynamics before the discovery of vaccination.
 Even in the absence of vaccination, an increase in variolation to protect against severe outcomes (Figure 1A) and a rapid increase in population sizes due to increasing births (Figure 1B,C) would have caused complex changes in transmission conditions over the 126-year period, which cannot be explained by traditional modeling approaches that only account for seasonal transmission forcing. 
 Data on population sizes and birth rates were obtained from the publicly available data set from \citep{krylova2020patterns}.
 Death rates were calculated to match increasing rates of population sizes:
@@ -174,34 +174,34 @@ The transmission rate is decomposed into a seasonal term $\tsub{\beta}{seas}(t)$
 where $N_{1670}$ represents the population size at the beginning of 1670, which is included to scale the $\tsub{\beta}{seas}(t)$.
 Previous studies have illustrated the feasibility of estimating $\delta(t)$ at different time scales by anchoring the seasonal term $\tsub{\beta}{seas}(t)$ to certain periods.
 For example, when inferring the impact of COVID-19 interventions, $\delta(t)$ was set to 1 during the pre-pandemic period and allowed to vary from 2020 onward, with change points defined at intervals ranging from one to four weeks \citep{park2024predicting,nielsen2025complex,park2025interplay}.
-Since we are interested in capturing long-term changes in transmission, we allow $\delta(t)$ to vary every year.
+Since we are interested in capturing long-term changes in transmission, we allowed $\delta(t)$ to vary every year.
 
 \subsection*{Statistical inference and implementation}
 
-In order to simultaneously estimate $\tsub{\beta}{seas}(t)$ and $\delta(t)$ alongside other parameters and initial conditions, we need to appropriately constrain the parameter space.
-Otherwise, estimating 52 terms for $\tsub{\beta}{seas}(t)$ and 126 terms for $\delta(t)$ requires estimation of $>170$ parameters, which is more than an order of magnitude greater than the number of parameters that are estimated for a typical infecitous disease models.
+In order to simultaneously estimate $\tsub{\beta}{seas}(t)$ and $\delta(t)$ alongside other parameters and initial conditions, we needed to appropriately constrain the parameter space.
+Otherwise, estimating 52 terms for $\tsub{\beta}{seas}(t)$ and 126 terms for $\delta(t)$ would require estimation of $>170$ parameters, which is more than an order of magnitude greater than the number of parameters that are estimated for a typical infecitous disease model.
 Bayesian inference, implemented via the Stan software, enables us to constrain the parameter space through prior distributions and allows for fast, efficient inference through state-of-art inferece algorithms \citep{carpenter2017stan}. 
 We first discuss our model parameterization, prior choices, and observation models used for fitting.
 Then, we describe our implementation in Stan.
 
-If we try to estimate all 52 terms of the seasonal term $\tsub{\beta}{seas}(t)$ separately, then the resulting transmission rate may not be realistic and difficult to interpret.
-Thus, to constrain the shape of the seasonal term $\tsub{\beta}{seas}(t)$ and allow for biological interpretation, we impose a cyclic, random-walk prior on a log scale \citep{park2025interplay}:
+If we were to estimate all 52 terms of the seasonal term $\tsub{\beta}{seas}(t)$ separately, then the resulting transmission rate may not be realistic and difficult to interpret.
+Thus, to constrain the shape of the seasonal term $\tsub{\beta}{seas}(t)$ and allow for biological interpretation, we imposed a cyclic, random-walk prior on a log scale \citep{park2025interplay}:
 \begin{align}
 \log\tsub{\beta}{seas}(t+1) &\sim \mathrm{Normal}(\log\tsub{\beta}{seas}(t), \tsub{\sigma}{seas}), \quad t=1,\dots,51  \\
 \log\tsub{\beta}{seas}(1) &\sim \mathrm{Normal}(\log\tsub{\beta}{seas}(52), \tsub{\sigma}{seas})
 \end{align}
 where the standard deviation $\tsub{\sigma}{seas}$ determines the smoothness of the seasonal transmission rate.
-Strong priors are imposed to constrain the parameter space for $\tsub{\sigma}{seas}$:
+Strong priors were imposed to constrain the parameter space for $\tsub{\sigma}{seas}$:
 \begin{equation}
 \tsub{\sigma}{seas} \sim \textrm{Half-Normal}(0, 0.01).
 \end{equation}
-We further impose an informative prior on $\tsub{\beta}{seas}(t)$, reflecting previously reported $\mathcal R_0$ values for smallpox transmission:
+We further imposed an informative prior on $\tsub{\beta}{seas}(t)$, reflecting previously reported $\mathcal R_0$ values for smallpox transmission:
 \begin{equation}
 \log\tsub{\beta}{seas}(t) \sim \mathrm{Normal}(0.5, 0.1).
 \end{equation}
 Combined with the assumed recovery rate of $-\log(1-1/3)/\mathrm{weeks}$, which corresponds to a mean infectious period of 3 weeks, the prior distribution of the basic reproduction number has a median of 4.9 and a 95\% quantile of 4.1 to 6.0.
 
-For similar reasons as above, we also utilize random walk priors to model the multiplicative time-varying transmission term on a log scale: $\delta(t) = \exp(\epsilon(t))$.
+For similar reasons as above, we also utilized random walk priors to model the multiplicative time-varying transmission term on a log scale: $\delta(t) = \exp(\epsilon(t))$.
 In order to reduce correlations in posterior distributions, we parameterized $\epsilon(t)$ by expression it as a sum of independent normal variables $z_\epsilon(t)$:
 \begin{align}
 z_\epsilon(t) &\sim \mathrm{Normal}(0, 1), \quad t = 1671, \dots, 1795 \\
@@ -212,7 +212,29 @@ z_\epsilon(t) &\sim \mathrm{Normal}(0, 1), \quad t = 1671, \dots, 1795 \\
 \end{align}
 where $z_\epsilon(t)$ determines the smoothness of $\epsilon(t)$. By setting the initial $\epsilon(1670)$ to zero and imposing constraining priors on $\sigma_\epsilon$, this approach anchors the seasonal transmission term $\tsub{\beta}{seas}(t)$ to early periods and allow for slow variation in transmission rates over time.
 
-The model is fitted to time series data 
+The model was fitted to smallpox deaths $D(t)$ by assuming a negative binomial observation model:
+\begin{align}
+D(t) &\sim \textrm{NegBin}(\rho N_{IR}(t), \phi)\\
+\rho &\sim \textrm{Beta}(1,1)\\
+\phi &\sim \textrm{Normal}(100, 20)
+\end{align}
+where $\rho$ represents the infection mortality rate, and $\phi$ represents the overdispersion parameter.
+Alongside parameters described earlier, we also estimated the initial conditions $S(1670)$ and $I(1670)$ at the beginning of 1670 as well as imported infections $\omega$:
+\begin{align}
+S(1670) &\sim \textrm{Beta}(1, 1)\\
+I(1670) &\sim \textrm{Half-Normal}(0,0.001)\\
+\omega &\sim \textrm{Half-Normal}(0, 200)
+\end{align}
+
+Previous studies primarily relied on Hamiltonian Monte Carlo (HMC) sampling implemented in Stan to estimate parameters of transmission models \citep{park2024predicting,nielsen2025complex,park2025interplay}.
+While this approach enables efficient exploration of high-dimensional parameter spaces and provides accurate uncertainty quantification, inference can remain computationally demanding for nonlinear models with many parameters. 
+During our investigation, we also encountered convergence issues, partly reflecting the sensitivity of HMC sampling to initial conditions.
+Instead, we began with an optimization from 1000 random starting values to obtain the maximum a posteriori estimates.
+Then, we used Laplace approximation to obtain approximate posterior distributions.
+
+\subsection*{Simulation studies}
+
+\textbf{Baseline simulation.} To evaluate the ability of a semi-mechanistic model to correctly infer long-term changes in transmission rates, we 
 
 \section*{Results}
 
