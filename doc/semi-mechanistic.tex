@@ -132,6 +132,15 @@ We test the resulting framework against a 126-year long time series of smallpox 
 \section*{Results}
 
 \begin{figure}[!ht]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{../diagram_model/diagram_model.pdf}
+\caption{
+\textbf{Developing semi-mechanistic models for estimating long-term changes in transmission from historical epidemic time series data.}
+}
+\end{center}
+\end{figure}
+
+\begin{figure}[!ht]
 \includegraphics[width=\textwidth]{../figure/figure_stanfit.pdf}
 \caption{
 \textbf{Data}
@@ -140,13 +149,6 @@ We test the resulting framework against a 126-year long time series of smallpox 
 
 \begin{figure}[!ht]
 \includegraphics[width=\textwidth]{../figure/figure_stanfit_sb.pdf}
-\caption{
-\textbf{Data}
-}
-\end{figure}
-
-\begin{figure}[!ht]
-\includegraphics[width=\textwidth]{../figure/figure_stanfit_sv.pdf}
 \caption{
 \textbf{Data}
 }
@@ -165,15 +167,6 @@ Even in the absence of vaccination, an increase in variolation to protect agains
 Data on population sizes and birth rates were obtained from the publicly available data set from \citep{krylova2020patterns}.
 Death rates were calculated to match increasing rates of population sizes:
 specifically, we calculated the difference between the weekly rate of population size increase and weekly  birth rate to obtain weekly death rates.
-
-\begin{figure}[!ht]
-\begin{center}
-\includegraphics[width=0.8\textwidth]{../diagram_model/diagram_model.pdf}
-\caption{
-\textbf{Developing semi-mechanistic models for estimating long-term changes in transmission from historical epidemic time series data.}
-}
-\end{center}
-\end{figure}
 
 \subsection*{Mathematical model}
 
@@ -261,11 +254,10 @@ Then, we used Laplace approximation to obtain approximate posterior distribution
 
 \subsection*{Simulation studies}
 
-First, to evaluate the ability of a semi-mechanistic model to correctly infer seasonal and long-term variation in transmission rates, we generated a synthetic data set using median posterior estimates from the smallpox analysis.
+To evaluate the ability of a semi-mechanistic model to correctly infer seasonal and long-term variation in transmission rates, we generated a synthetic data set using median posterior estimates from the smallpox analysis.
 We then fitted the same model using the same process as outlined above, using 100 random starting values for optimization.
+We repeated the analysis 10 times.
 
-Second, we also tested whether resulting parameter estimates can still provide useful interpretation under model misspecification.
-To do so, we considered a scenario where the population is removed from the susceptible compartment at an increasing rate, reflecting variolation practices.
 
 \bibliography{semi-mechanistic}
 

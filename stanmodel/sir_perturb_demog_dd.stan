@@ -31,7 +31,7 @@ transformed parameters {
   vector[Nyear] epsilon;
   epsilon[1] = 0;
   for (i in 2:Nyear) {
-    epsilon[i] = sigma_epsilon * z_epsilon[i-1];
+    epsilon[i] = epsilon[i-1] + sigma_epsilon * z_epsilon[i-1];
   }
   
   S[1] = S0 * pop[1];

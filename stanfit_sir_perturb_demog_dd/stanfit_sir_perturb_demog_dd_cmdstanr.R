@@ -20,7 +20,7 @@ standata <- list(
   gamma=-log(1-1/3)
 )
 
-nfit <- 1000
+nfit <- 100
 
 t0 <- Sys.time()
 reslist <- vector('list', nfit)
@@ -29,6 +29,7 @@ for (i in 1:nfit) {
   
   oo <- model$optimize(data=standata,
                        seed=i,
+                       jacobian = TRUE,
                        show_messages = FALSE,
                        show_exceptions = FALSE,
                        iter=1e4)
@@ -46,6 +47,8 @@ for (i in 1:nfit) {
 stanfit_sir_perturb_demog_dd_cmdstanr_optim <- reslist %>%
   bind_rows
 
+plot(stanfit_sir_perturb_demog_dd_cmdstanr_optim$value)
+
 oo_final <- model$optimize(data=standata,
                            seed=stanfit_sir_perturb_demog_dd_cmdstanr_optim$seed[which.max(stanfit_sir_perturb_demog_dd_cmdstanr_optim$value)],
                            jacobian = TRUE,
@@ -55,7 +58,7 @@ stanfit_sir_perturb_demog_dd_cmdstanr_laplace <-
   model$laplace(data = standata, mode = oo_final)
 
 t1 <- Sys.time()
-t1 - t0 ## ~4 minutes for 100 optimization
+t1 - t0 ## ~8 minutes for 100 optimization
 
 summary_sir_perturb_demog_dd_cmdstanr_laplace <- 
   stanfit_sir_perturb_demog_dd_cmdstanr_laplace$summary()
@@ -70,7 +73,7 @@ dd <- oo_final$draws()
 plot(data_filter$smpx)
 lines(dd[grepl("C\\[", colnames(dd))], col=2)
 
-plot(exp(dd[grepl("z_epsilon\\[", colnames(dd))]*dd[grepl("sigma_epsilon", colnames(dd))]), type="l")    
+plot(exp(dd[grepl("^epsilon\\[", colnames(dd))]), type="l")    
 
 dd[grepl("sigma_epsilon", colnames(dd))]
 
