@@ -93,7 +93,7 @@
 \begin{flushleft}{
 	\Large
 	\textbf\newline{
-  Inference and interpretation of long-term changes in infectious disease transmission using semi-mechanistic models
+  Semi-mechanistic models for estimating and interpreting long-term changes in infectious disease transmission from historical epidemic time series
 	}
 }
 \newline
@@ -126,8 +126,33 @@ Notably, models utilizing Bayesian inference have proven particularly useful for
 These methodological advances provide a basis for developing semi-mechanistic models that allow estimation of transmission rates across two different time scales, with potential applications beyond the context of COVID-19 interventions, but their estimability and generalizability have not yet been tested.
 Furthermore, the apparent discrepancy between the estimated intervention effects and observed changes in mobility patterns indicate potential challenges in interpreting parameter estimates from semi-mechanistic models \citep{park2024predicting}.
 
-Here, we present a semi-mechanistic framework for simultaneously estimating seasonal and long-term variation in disease transmission and investigate its estimability and interpretibility.
+Here, we present a Bayesian semi-mechanistic framework for simultaneously estimating seasonal and long-term variation in disease transmission and investigate its estimability and interpretibility.
 We test the resulting framework against a 126-year long time series of smallpox deaths, which presents a computationally challenging example.
+
+\section*{Results}
+
+\begin{figure}[!ht]
+\includegraphics[width=\textwidth]{../figure/figure_stanfit.pdf}
+\caption{
+\textbf{Data}
+}
+\end{figure}
+
+\begin{figure}[!ht]
+\includegraphics[width=\textwidth]{../figure/figure_stanfit_sb.pdf}
+\caption{
+\textbf{Data}
+}
+\end{figure}
+
+\begin{figure}[!ht]
+\includegraphics[width=\textwidth]{../figure/figure_stanfit_sv.pdf}
+\caption{
+\textbf{Data}
+}
+\end{figure}
+
+\section*{Discussion}
 
 \section*{Materials and Methods}
 
@@ -142,10 +167,12 @@ Death rates were calculated to match increasing rates of population sizes:
 specifically, we calculated the difference between the weekly rate of population size increase and weekly  birth rate to obtain weekly death rates.
 
 \begin{figure}[!ht]
-\includegraphics[width=\textwidth]{../figure/figure_data.pdf}
+\begin{center}
+\includegraphics[width=0.8\textwidth]{../diagram_model/diagram_model.pdf}
 \caption{
-\textbf{Data}
+\textbf{Developing semi-mechanistic models for estimating long-term changes in transmission from historical epidemic time series data.}
 }
+\end{center}
 \end{figure}
 
 \subsection*{Mathematical model}
@@ -234,35 +261,11 @@ Then, we used Laplace approximation to obtain approximate posterior distribution
 
 \subsection*{Simulation studies}
 
-\textbf{Baseline simulation.} To evaluate the ability of a semi-mechanistic model to correctly infer seasonal and long-term variation in transmission rates, we generated a synthetic data set using median posterior estimates from the smallpox analysis.
+First, to evaluate the ability of a semi-mechanistic model to correctly infer seasonal and long-term variation in transmission rates, we generated a synthetic data set using median posterior estimates from the smallpox analysis.
+We then fitted the same model using the same process as outlined above, using 100 random starting values for optimization.
 
-
-\textbf{Variolation simulation.} 
-
-\section*{Results}
-
-\begin{figure}[!ht]
-\includegraphics[width=\textwidth]{../figure/figure_stanfit.pdf}
-\caption{
-\textbf{Data}
-}
-\end{figure}
-
-\begin{figure}[!ht]
-\includegraphics[width=\textwidth]{../figure/figure_stanfit_sb.pdf}
-\caption{
-\textbf{Data}
-}
-\end{figure}
-
-\begin{figure}[!ht]
-\includegraphics[width=\textwidth]{../figure/figure_stanfit_sv.pdf}
-\caption{
-\textbf{Data}
-}
-\end{figure}
-
-\section*{Discussion}
+Second, we also tested whether resulting parameter estimates can still provide useful interpretation under model misspecification.
+To do so, we considered a scenario where the population is removed from the susceptible compartment at an increasing rate, reflecting variolation practices.
 
 \bibliography{semi-mechanistic}
 

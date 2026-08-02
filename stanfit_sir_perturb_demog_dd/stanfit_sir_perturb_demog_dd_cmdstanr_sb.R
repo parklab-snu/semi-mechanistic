@@ -27,6 +27,7 @@ for (i in 1:nfit) {
                        seed=i,
                        show_messages = FALSE,
                        show_exceptions = FALSE,
+                       jacobian = TRUE,
                        iter=1e4)
   
   lp <- try(oo$lp())

@@ -31,7 +31,7 @@ simulate_sir <- function(week,
     
     Svec[i] <- Svec[i-1] - Sout + brate[i] * pop[i]
     Ivec[i] <- Ivec[i-1] + StoI - Iout
-    Cvec[i] <- StoI * rho
+    Cvec[i] <- ItoR * rho
   }
   
   cases <- rnbinom(tmax, mu=Cvec, size=phi)
@@ -80,7 +80,7 @@ simulate_sir_vari <- function(week,
     
     Svec[i] <- Svec[i-1] - Sout + brate[i] * pop[i]
     Ivec[i] <- Ivec[i-1] + StoI - Iout
-    Cvec[i] <- StoI * rho
+    Cvec[i] <- ItoR * rho
   }
   
   cases <- rnbinom(tmax, mu=Cvec, size=phi)
