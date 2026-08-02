@@ -136,23 +136,62 @@ We test the resulting framework against a 126-year long time series of smallpox 
 \includegraphics[width=0.8\textwidth]{../diagram_model/diagram_model.pdf}
 \caption{
 \textbf{Developing semi-mechanistic models for estimating long-term changes in transmission from historical epidemic time series data.}
+(A) Observed epidemic and demographic data, including population size and birth rate.
+Blue shaded regions indicate the increasing intensity of variolation practices.
+(B) Schematic diagram illustrating the semi-mechanistic model.
+The semi-mechanistic model allows for slow, annual variation and fast, seasonal variation in disease transmission rates.
 }
 \end{center}
 \end{figure}
 
+First, the data set consists of weekly reports of smallpox deaths spanning 126 years (Figure 1A).
+During this period, many factors that could affect disease transmission changed, including variolation practices and demographic patterns.
+For instance, variolation was first introduced in 1721 and increased in intensity until the late 1790s and early 1800s, when vaccination was introduced.
+These changes likely decreased smallpox transmission, but quantifying the prevalence and effectiveness of variolation practices is challenging.
+During the same period, the birth rate also increased, contributing to an almost 2.5-fold increase in population size, which likely increased contact rates and smallpox transmission.
+Many other changes likely occurred, including changes in sanitary practices and population structure.
+
+It would be infeasible to explicitly incorporate all these changes into a model, especially because quantitative data describing the underlying changes are unavailable.
+Instead, our goal is to develop a semi-mechanistic model that seeks to implicitly capture the effects of unmodeled factors on disease transmission (Figure 1B).
+Specifically, we decompose the transmission rate of the classic SIR model into a seasonal term and an annual term, and try to estimate both terms simultaneously using Bayesian inference.
+
+Fitting the resulting model to 126 years of weekly observations presents substantial computational challenges. 
+To address these challenges, we obtain maximum a posteriori estimates through optimization and use a Laplace approximation to characterize posterior uncertainty.
+Implementation details are provided in the Materials and Methods section.
+
 \begin{figure}[!ht]
 \includegraphics[width=\textwidth]{../figure/figure_stanfit.pdf}
 \caption{
-\textbf{Data}
+\textbf{Summary of model fits to smallpox data set.}
+(A) Observed data (black points) and model fits (red lines).
+(B) Estimated seasonal transmission rate.
+(C) Estimated multiplicative changes in annual transmission.
+Red lines indicate the maximum a posteriori estimate and shaded regions represent the 90\% credible interval.
+Blue shaded regions indicate the increasing intensity of variolation practices.
 }
 \end{figure}
 
+Our semi-mechanistic SIR model is able to capture the overall epidemic patterns across the 126-year time series, including long-term changes in outbreak magnitude (Figure 2A).
+In particular, we estimate a clear seasonal pattern in transmission, with transmission increasing from the beginning of the year, peaking around week 23, and then gradually decreasing toward the end of the year (Figure 2B).
+
+We also estimate substantial long-term variation in transmission rates (Figure 2C).
+The annual transmission term increased sharply during the 1680s, reaching nearly three times its value in 1670, and then declined to its lowest value around early 1700s.
+Even after the introduction of variolation in 1721, the annual transmission multiplier gradually increased again, reaching almost four times its 1670 value in the late 1760s.
+Despite the continued increase in the intensity of variolation practices, annual transmission remained relatively high throughout the 1770s and 1780s before decreasing rapidly toward the end of the study period.
+This apparent discrepancy suggests that the estimated annual transmission term likely captures the combined effects of multiple unmodeled factors rather than the effect of variolation alone.
+
 \begin{figure}[!ht]
-\includegraphics[width=\textwidth]{../figure/figure_stanfit_sb.pdf}
+\includegraphics[width=\textwidth]{../figure_rep/figure_stanfit_rep.pdf}
 \caption{
-\textbf{Data}
+\textbf{Summary of simulation recovery experiments.}
+(A) Comparisons between the assumed (black) and estimated (red) seasonal transmission rates.
+(B) Comparisons between the assumed (black) and estimated (red) annual transmission rates.
 }
 \end{figure}
+
+The discrepancy between increasing variolation efforts, which we expect to drive reduction in transmission, and the estimated patterns of increasing transmission further raises a question of whether the semi-mechanistic model is able to correctly estimate the underlying transmission pattern.
+Thus, we perform simulation recovery experiments, where we generated 10 synthetic time series using the estimated values and fitted the same model to each time series independently (Figure 3).
+We find that our model consistently underestimates seasonal transmission rates (Figure 3A), but is able to accurately recover long-term changes in transmisison (Figure 3B).
 
 \section*{Discussion}
 
@@ -249,7 +288,7 @@ I(1670) &\sim \textrm{Half-Normal}(0,0.001)\\
 Previous studies primarily relied on Hamiltonian Monte Carlo (HMC) sampling implemented in Stan to estimate parameters of transmission models \citep{park2024predicting,nielsen2025complex,park2025interplay}.
 While this approach enables efficient exploration of high-dimensional parameter spaces and provides accurate uncertainty quantification, inference can remain computationally demanding for nonlinear models with many parameters. 
 During our investigation, we also encountered convergence issues, partly reflecting the sensitivity of HMC sampling to initial conditions.
-Instead, we began with an optimization from 1000 random starting values to obtain the maximum a posteriori estimates.
+Instead, we began with an optimization from 100 random starting values to obtain the maximum a posteriori estimates.
 Then, we used Laplace approximation to obtain approximate posterior distributions.
 
 \subsection*{Simulation studies}

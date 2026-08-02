@@ -77,6 +77,6 @@ g2 <- ggplot(epsilondata) +
     axis.title.x = element_blank()
   )
 
-gcomb <- ggarrange(g1, g2, nrow=2)
+gcomb <- ggarrange(g1, g2, nrow=2, labels=c("A", "B"))
 
 ggsave("figure_stanfit_rep.pdf", gcomb, width=6, height=4)
