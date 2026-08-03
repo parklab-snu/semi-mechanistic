@@ -131,6 +131,8 @@ We test the resulting framework against a 126-year long time series of smallpox 
 
 \section*{Results}
 
+\subsection*{Developing semi-mechanistic models for estimating seasonal and long-term variation in disease transmission}
+
 \begin{figure}[!ht]
 \begin{center}
 \includegraphics[width=0.8\textwidth]{../diagram_model/diagram_model.pdf}
@@ -153,11 +155,21 @@ Many other changes likely occurred, including changes in sanitary practices and 
 
 It would be infeasible to explicitly incorporate all these changes into a model, especially because quantitative data describing the underlying changes are unavailable.
 Instead, our goal is to develop a semi-mechanistic model that seeks to implicitly capture the effects of unmodeled factors on disease transmission (Figure 1B).
-Specifically, we decompose the transmission rate of the classic SIR model into a seasonal term and an annual term, and try to estimate both terms simultaneously using Bayesian inference.
+Specifically, we decompose the transmission rate $\beta(t)$ of the classic SIR model into a seasonal term $\tsub{\beta}{seas}(t)$ and a slow, time-varying term $\delta(t)$:
+\begin{equation}
+\beta(t) = \frac{\tsub{\beta}{seas}(t) \delta(t)}{N_{1670}},
+\end{equation}
+where $N_{1670}$ represents the population size at the beginning of 1670, which is included to scale the $\tsub{\beta}{seas}(t)$.
+Note that we are assuming density dependence transmission to account for potential impact of increase in population sizes on transmission.
+For the main analysis, we allow $\delta(t)$ to vary every year and consider slower variation as a supplementary analysis.
+Both $\tsub{\beta}{seas}(t)$ and $\delta(t)$ terms are modeled using random walk priors to impose smoothness.
+We then try to fit the resulting SIR model to the time series of smallpox deaths and try to estimate both terms simultaneously using Bayesian inference.
 
 Fitting the resulting model to 126 years of weekly observations presents substantial computational challenges. 
 To address these challenges, we obtain maximum a posteriori estimates through optimization and use a Laplace approximation to characterize posterior uncertainty.
 Implementation details are provided in the Materials and Methods section.
+
+\subsection*{Potential long-term changes in smallpox transmission}
 
 \begin{figure}[!ht]
 \includegraphics[width=\textwidth]{../figure/figure_stanfit.pdf}
@@ -166,7 +178,7 @@ Implementation details are provided in the Materials and Methods section.
 (A) Observed data (black points) and model fits (red lines).
 (B) Estimated seasonal transmission rate.
 (C) Estimated multiplicative changes in annual transmission.
-Red lines indicate the maximum a posteriori estimate and shaded regions represent the 90\% credible interval.
+Red lines indicate the posterior median estimate and shaded regions represent the 90\% credible interval.
 Blue shaded regions indicate the increasing intensity of variolation practices.
 }
 \end{figure}
@@ -180,18 +192,24 @@ Even after the introduction of variolation in 1721, the annual transmission mult
 Despite the continued increase in the intensity of variolation practices, annual transmission remained relatively high throughout the 1770s and 1780s before decreasing rapidly toward the end of the study period.
 This apparent discrepancy suggests that the estimated annual transmission term likely captures the combined effects of multiple unmodeled factors rather than the effect of variolation alone.
 
+\subsection*{Simulation-recovery experiments}
+
 \begin{figure}[!ht]
 \includegraphics[width=\textwidth]{../figure_rep/figure_stanfit_rep.pdf}
 \caption{
-\textbf{Summary of simulation recovery experiments.}
+\textbf{Summary of simulation-recovery experiments.}
 (A) Comparisons between the assumed (black) and estimated (red) seasonal transmission rates.
 (B) Comparisons between the assumed (black) and estimated (red) annual transmission rates.
 }
 \end{figure}
 
 The discrepancy between increasing variolation efforts, which we expect to drive reduction in transmission, and the estimated patterns of increasing transmission further raises a question of whether the semi-mechanistic model is able to correctly estimate the underlying transmission pattern.
-Thus, we perform simulation recovery experiments, where we generated 10 synthetic time series using the estimated values and fitted the same model to each time series independently (Figure 3).
-We find that our model consistently underestimates seasonal transmission rates (Figure 3A), but is able to accurately recover long-term changes in transmisison (Figure 3B).
+Thus, we perform simulation recovery experiments, where we generate 10 synthetic time series using the estimated values and fit the same model to each time series independently (Figure 3).
+We find that our model consistently underestimates seasonal transmission rates (Figure 3A), but is able to accurately recover long-term changes in transmission (Figure 3B).
+Across all 10 simulations, the model is able to accurately capture the observed epidemic patterns with $R^2$ values over 0.7 consistently.
+
+As a negative control experiment, we also generate 10 synthetic time series, where the annual term $\delta(t)$ is set to 1, and fit the same model to each time series independently.
+
 
 \section*{Discussion}
 
@@ -238,8 +256,8 @@ Since we are interested in capturing long-term changes in transmission, we allow
 \subsection*{Statistical inference and implementation}
 
 In order to simultaneously estimate $\tsub{\beta}{seas}(t)$ and $\delta(t)$ alongside other parameters and initial conditions, we needed to appropriately constrain the parameter space.
-Otherwise, estimating 52 terms for $\tsub{\beta}{seas}(t)$ and 126 terms for $\delta(t)$ would require estimation of $>170$ parameters, which is more than an order of magnitude greater than the number of parameters that are estimated for a typical infecitous disease model.
-Bayesian inference, implemented via the Stan software, enables us to constrain the parameter space through prior distributions and allows for fast, efficient inference through state-of-art inferece algorithms \citep{carpenter2017stan}. 
+Otherwise, estimating 52 terms for $\tsub{\beta}{seas}(t)$ and 126 terms for $\delta(t)$ would require estimation of $>170$ parameters, which is more than an order of magnitude greater than the number of parameters that are estimated for a typical infectious disease model.
+Bayesian inference, implemented via the Stan software, enables us to constrain the parameter space through prior distributions and allows for fast, efficient inference through state-of-art inference algorithms \citep{carpenter2017stan}. 
 We first discuss our model parameterization, prior choices, and observation models used for fitting.
 Then, we describe our implementation in Stan.
 
@@ -296,6 +314,32 @@ Then, we used Laplace approximation to obtain approximate posterior distribution
 To evaluate the ability of a semi-mechanistic model to correctly infer seasonal and long-term variation in transmission rates, we generated a synthetic data set using median posterior estimates from the smallpox analysis.
 We then fitted the same model using the same process as outlined above, using 100 random starting values for optimization.
 We repeated the analysis 10 times.
+
+\pagebreak
+
+\renewcommand\theequation{S\arabic{equation}}
+\renewcommand\thefigure{S\arabic{figure}}    
+\setcounter{equation}{0}
+\setcounter{figure}{0}
+
+\section*{Supplementary Figure}
+
+\begin{figure}[!ht]
+\includegraphics[width=\textwidth]{../figure_rep/figure_stanfit_rep_traj_1.pdf}
+\caption{
+\textbf{Comparisons between observed and predicted epidemic trajectories from simulation recovery experiments.}
+}
+\end{figure}
+
+\pagebreak
+
+
+\begin{figure}[!ht]
+\includegraphics[width=\textwidth]{../figure_rep/figure_stanfit_rep_traj_2.pdf}
+\caption{
+\textbf{Summary of comparisons between observed and predicted epidemic trajectories from simulation recovery experiments.}
+}
+\end{figure}
 
 
 \bibliography{semi-mechanistic}

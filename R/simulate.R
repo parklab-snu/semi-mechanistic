@@ -13,6 +13,8 @@ simulate_sir <- function(week,
                          phi,
                          tmax,
                          seed=101) {
+  set.seed(seed)
+  
   Svec <- Ivec <- Cvec <- rep(0, tmax)
   
   Svec[1] <- S0 * pop[1]
@@ -60,6 +62,8 @@ simulate_sir_vari <- function(week,
                               delta,
                               tmax,
                               seed=101) {
+  set.seed(seed)
+  
   Svec <- Ivec <- Cvec <- rep(0, tmax)
   
   Svec[1] <- S0 * pop[1]
