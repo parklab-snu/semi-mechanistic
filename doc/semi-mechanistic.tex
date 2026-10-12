@@ -45,7 +45,7 @@
 \usepackage[pdfencoding=auto, psdextra]{hyperref}
 
 \usepackage{natbib}
-\bibliographystyle{unsrt}
+\bibliographystyle{chicago}
 \date{\today}
 
 \usepackage{xspace}
@@ -93,7 +93,7 @@
 \begin{flushleft}{
 	\Large
 	\textbf\newline{
-  Semi-mechanistic models for estimating and interpreting long-term changes in infectious disease transmission from historical epidemic time series
+  Feasibility of using semi-mechanistic models for estimating long-term changes in infectious disease transmission from historical epidemic time series
 	}
 }
 \newline
@@ -234,14 +234,53 @@ Since we assumed random walk priors, the estimated long-term changes in transmis
 Despite this divergence, our estimates still did not generate any meaningful patterns and provided high coverage values ($\approx 1$), indicating that credible intervals consistently includes one and that deviation from one is not statistically meaningful (Figure 4C). 
 For this experiment, the model also gave similar but slightly smaller levels of bias ($\approx 2\%$; Figure 4B).
 
+\subsection*{Changes in reporting rate}
+
+
+\begin{figure}[!ht]
+\includegraphics[width=\textwidth]{../figure/figure_stanfit_rho.pdf}
+\caption{
+\textbf{Estimated reporting rates and corresponding long-term changes in transmission.}
+(A) Estimated reporting rates assuming constant (red) and exponentially changing (blue) reporting rates.
+(B) Estimated multiplicative changes in annual transmission.
+Colored lines indicate posterior median estimates and shaded regions represent 90\% credible intervals.
+}
+\end{figure}
+
+So far, we assumed a fixed reporting rate throughout the entire study period, which was estimated to be around 12.4\% (90\% CI: 12.3\%--12.5\%) (Figure 5A).
+However, it is unlikely for reporting rate to stay constant over a such long period of time.
+To test the effect of changing reporting rates in our estimates of long-term changes in transmission, we allowed the reporting rate to change exponentially over time and refitted the model.
+Under this assumption, we estimated the reporting rate to increase from 9.7\% to 15.6\% over 126 years, corresponding to a 1.6 fold increase (Figure 5A).
+Qualitative patterns in in the estimated long-term transmission rate remained robust (e.g., increase in transmission from the early 1700s to 1770s and a decrease in transmission in the late 1780s), but the exact values differ substantially from our initial estimates based on fixed reporting rate (Figure 5B).
+
 \section*{Discussion}
 
-Here, we developed a Bayesian semi-mechanistic approach for estimating long-term changes in transmission from incidence time series alone.
-We demonstrated its application using historical time series on smallpox deaths and simulations, which span over 120 years. 
-In particular, simulation-recovery experiments demonstrated the feasibility of accurately estimating long-term changes in transmission.
+Here, we developed a Bayesian semi-mechanistic approach for estimating long-term changes in transmission from epidemic time series.
+We demonstrated its application using historical smallpox mortality data spanning more than 120 years and evaluated its performance using simulation-recovery experiments. 
+These experiments demonstrated that the approach can accurately recover broad changes in transmission under the assumed model.
+Allowing reporting rates to vary over time preserved several major temporal features of the estimated transmission trajectory, but altered the magnitude and timing of some changes, highlighting both the robustness of these features and the sensitivity of the reconstruction to underlying model assumptions.
 
+Our study builds on earlier efforts to reconstruct transmission from long epidemic time series by estimating flexible long-term changes within a Bayesian semi-mechanistic framework.
+The most relevant precedent is \cite{krylova2011predicting}, who extended the approach of \cite{fine1982measles} to reconstruct smallpox transmission in London from 1664 to 1930. 
+This analysis focused on changes in seasonal transmission patterns, but also identified an increase in mean transmission between the 1660s and 1760s;
+we note that the degree of increase was considerably smaller than ours.
+These changes were summarized by averaging across distinct historical periods, whereas our framework explicitly estimates a long-term transmission trajectory and its associated uncertainty.
+Another close precedent is \cite{becker2019long}, who fitted an SEIR model to measles mortality and incidence data from London between 1897 and 1991. 
+Interestingly, they found that most changes in epidemic dynamics could be explained by changes in demography and vaccination under a fixed seasonal transmission pattern, with additional perturbations associated with the 1918 influenza pandemic and World War II.
+Over a shorter period, \cite{hooker2011parameterizing} estimated a linear increase in transmission from Ontario measles data spanning 1939–1965, although this trend was highly uncertain. 
+To our knowledge, this is the first study to jointly reconstruct seasonal variation and flexible long-term changes in transmission within a Bayesian framework from an epidemic time series spanning more than a century.
 
+There are several limitations to our framework, which suggest new directions for future methodological development.
+First of all, fitting a semi-mechanistic model to such long time series using Markov Chain Monte Carlo can be computationally intensive.
+To remedy this issue, we relied on simple optimization and a Laplace approximation to obtain an approximate posterior.
+However, full Monte Carlo sampling is needed to assess whether this approximation accurately captures posterior uncertainty.
+Indeed, we found that the current framework can introduce a small amount of bias and provide overly narrow or wide credible intervals, depending on the scenario.
+Other approximations, such as variational inference, can also be explored.
 
+Second, our reporting rate anlysis indicates that the exact transmission trajectory can be sensitive to unedrlying model assumptions.
+Here, we focused on simple sensitivity analysis to demonstrate feasibility of reconstruction long-term transmission trajectory, but exhaustive modeling effort is needed to assess
+
+Finally, while our analysis suggests
 
 \section*{Materials and Methods}
 

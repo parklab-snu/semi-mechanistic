@@ -79,6 +79,8 @@ dd[grepl("sigma_epsilon", colnames(dd))]
 
 plot(exp(dd[grepl("beta\\[", colnames(dd))])*3, type="l")    
 
+plot(dd[grepl("rhovec\\[", colnames(dd))], type="l")    
+
 plot(dd[grepl("R0\\[", colnames(dd))], type="l")    
 plot(dd[grepl("S\\[", colnames(dd))]/data_filter$population, type="l")    
 
@@ -87,3 +89,4 @@ dd[grepl("phi", colnames(dd))]
 dd[grepl("rho0", colnames(dd))]
 
 dd[grepl("rhos", colnames(dd))]
+
