@@ -14,7 +14,8 @@ data {
 parameters {
   real<lower=0, upper=1> S0;
   real<lower=0, upper=1> I0;
-  real<lower=0, upper=1> rho;
+  real<lower=0, upper=1> rho0;
+  real rhos;
   array[52] real logbeta;
   real<lower=0> sigma;
   array[Nyear-1] real z_epsilon;
@@ -39,6 +40,7 @@ transformed parameters {
   C[1] = 0;
   
   for (i in 2:N) {
+    real rho = rho0 * exp(rhos * i/30000);
     real beta_eff = exp(logbeta[week[i]]+epsilon[year[i]]);
     real foi = beta_eff * (I[i-1]+omega)/pop[1];
     real Sout = (1-exp(-(foi+drate[i]))) * S[i-1];
@@ -66,7 +68,8 @@ model {
   
   S0 ~ beta(1, 1);
   I0 ~ normal(0, 0.001);
-  rho ~ beta(1, 1);
+  rho0 ~ beta(1, 1);
+  rhos ~ normal(0, 1);
   phi ~ normal(100, 20);
   omega ~ normal(0, 200);
   
