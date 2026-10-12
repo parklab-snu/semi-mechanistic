@@ -113,21 +113,22 @@ Sang Woo Park\textsuperscript{1,*}, To be invited
 
 \section*{Introduction}
 
-A fundamental aim in infectious disease dynamics research is characterizing how disease transmission rates change over time.
-For example, classical studies of endemic childhood infections, particularly measles, focused on estimating seasonal fluctuation in transmission rates driven by school term and climate effects.
-These efforts not only generated key insights into the drivers of epidemic dynamics but also established core methodological foundations \citep{bjornstad2002dynamics,grenfell2002dynamics,he2010plug,king2016statistical}.
-Yet transmission rates can also evolve over longer time scales, reflecting gradual shifts in host behavior, demography, socioeconomic factors, and environmental conditions.
-Compared with seasonal variation, however, these low-frequency changes have received far less attention, in part because they are more difficult to identify from incidence data and are often confounded with other slow-moving processes such as susceptible replenishment and vaccination \citep{hooker2011parameterizing}.
+A fundamental aim in infectious disease dynamics research is characterizing how disease transmission rates change over time \citep{grenfell2002dynamics,hooker2011parameterizing,becker2019long,jagan2020fast}.
+For example, classic studies of endemic childhood infections, particularly measles, focused on estimating seasonal fluctuation in transmission rates driven by school term and climate effects \citep{fine1982measles,koelle2005refractory,ferrari2008dynamics,dalziel2016persistent}.
+These efforts not only generated key insights into the drivers of epidemic dynamics but also established core methodological foundations for infectious disease research \citep{bjornstad2002dynamics,grenfell2002dynamics,he2010plug,king2016statistical}.
+Yet transmission rates can also evolve over longer time scales, reflecting gradual shifts in host behavior \citep{weitz2020awareness,gozzi2025comparative}, demography, socioeconomic factors \citep{becker2019long}, and environmental conditions \citep{baker2019epidemic}.
+Compared with seasonal variation, however, these low-frequency changes have received far less attention, in part because they are more difficult to identify from incidence data alone and are often confounded with other slow-moving processes such as susceptible replenishment and vaccination \citep{hooker2011parameterizing}.
 
 Disruptions in disease transmission caused by COVID-19 nonpharmaceutical interventions also highlighted the similar need for new frameworks for estimating transmission rates that can vary flexibly across two different time scales:
 explaining these disruptions requires simultaneous estimation of seasonal transmission patterns and rapid changes in transmission rate reflecting intervention effects.
-To capture the impact of nonpharmaceutical interventions on disease transmission, some researchers have relied on known metrics of intervention strengths, such as mobility patterns \citep{park2024predicting2,howerton2025using} and stringency indices \citep{holmdahl2024differential}, whereas other have sought to directly estimate these impacts through various statistical methods \citep{bents2023modeling,sauteur2025global,nguyen2026dynamics}.
-Notably, models utilizing Bayesian inference have proven particularly useful for estimating flexible changes in transmission patterns, where statistical constraints through prior distributions can appropriately limit the variability in parameter estimates \citep{park2024predicting,nielsen2025complex,park2025interplay}.
+To capture the impact of nonpharmaceutical interventions on disease transmission, some researchers have relied on known metrics of intervention strengths, such as mobility patterns \citep{park2024predicting2,howerton2025using} and stringency indices \citep{holmdahl2024differential,lau2024impact,yan2026impact}, whereas other have sought to directly estimate these impacts through various statistical methods \citep{flaxman2020estimating,bents2023modeling,sauteur2025global,nguyen2026dynamics}.
+Notably, models utilizing Bayesian inference framework have proven particularly useful for estimating flexible changes in transmission patterns, where statistical constraints through prior distributions can appropriately limit the variability in parameter estimates \citep{flaxman2020estimating,park2024predicting,nielsen2025complex,park2025interplay}.
 These methodological advances provide a basis for developing semi-mechanistic models that allow estimation of transmission rates across two different time scales, with potential applications beyond the context of COVID-19 interventions, but their estimability and generalizability have not yet been tested.
 Furthermore, the apparent discrepancy between the estimated intervention effects and observed changes in mobility patterns indicate potential challenges in interpreting parameter estimates from semi-mechanistic models \citep{park2024predicting}.
 
-Here, we present a Bayesian semi-mechanistic framework for simultaneously estimating seasonal and long-term variation in disease transmission and investigate its estimability and interpretibility.
+Inspired by these efforts, we present a Bayesian semi-mechanistic framework for simultaneously estimating seasonal and long-term variation in disease transmission and investigate its estimability and interpretibility.
 We test the resulting framework against a 126-year long time series of smallpox deaths, which presents a computationally challenging example.
+We then validate the methodology using simulation-recovery experiments.
 
 \section*{Results}
 
@@ -146,7 +147,7 @@ The semi-mechanistic model allows for slow, annual variation and fast, seasonal 
 \end{center}
 \end{figure}
 
-First, the data set consists of weekly reports of smallpox deaths spanning 126 years (Figure 1A).
+First, the data set consisted of weekly reports of smallpox deaths spanning 126 years (Figure 1A).
 During this period, many factors that could affect disease transmission changed, including variolation practices and demographic patterns.
 For instance, variolation was first introduced in 1721 and increased in intensity until the late 1790s and early 1800s, when vaccination was introduced.
 These changes likely decreased smallpox transmission, but quantifying the prevalence and effectiveness of variolation practices is challenging.
@@ -154,19 +155,19 @@ During the same period, the birth rate also increased, contributing to an almost
 Many other changes likely occurred, including changes in sanitary practices and population structure.
 
 It would be infeasible to explicitly incorporate all these changes into a model, especially because quantitative data describing the underlying changes are unavailable.
-Instead, our goal is to develop a semi-mechanistic model that seeks to implicitly capture the effects of unmodeled factors on disease transmission (Figure 1B).
-Specifically, we decompose the transmission rate $\beta(t)$ of the classic SIR model into a seasonal term $\tsub{\beta}{seas}(t)$ and a slow, time-varying term $\delta(t)$:
+Instead, our goal was to develop a semi-mechanistic model that seeks to implicitly capture the effects of unmodeled factors on disease transmission (Figure 1B).
+Specifically, we decomposed the transmission rate $\beta(t)$ of the classic SIR model into a seasonal term $\tsub{\beta}{seas}(t)$ and a slow, time-varying term $\delta(t)$:
 \begin{equation}
 \beta(t) = \frac{\tsub{\beta}{seas}(t) \delta(t)}{N_{1670}},
 \end{equation}
 where $N_{1670}$ represents the population size at the beginning of 1670, which is included to scale the $\tsub{\beta}{seas}(t)$.
 Note that we are assuming density dependence transmission to account for potential impact of increase in population sizes on transmission.
-For the main analysis, we allow $\delta(t)$ to vary every year and consider slower variation as a supplementary analysis.
-Both $\tsub{\beta}{seas}(t)$ and $\delta(t)$ terms are modeled using random walk priors to impose smoothness.
+For the main analysis, we allowed $\delta(t)$ to vary every year and considered slower variation as a supplementary analysis \swp{TODO}.
+Both $\tsub{\beta}{seas}(t)$ and $\delta(t)$ terms were modeled using random walk priors to impose smoothness.
 We then try to fit the resulting SIR model to the time series of smallpox deaths and try to estimate both terms simultaneously using Bayesian inference.
 
 Fitting the resulting model to 126 years of weekly observations presents substantial computational challenges. 
-To address these challenges, we obtain maximum a posteriori estimates through optimization and use a Laplace approximation to characterize posterior uncertainty.
+To address these challenges, we obtained maximum a posteriori estimates through optimization and used a Laplace approximation to characterize posterior uncertainty.
 Implementation details are provided in the Materials and Methods section.
 
 \subsection*{Potential long-term changes in smallpox transmission}
@@ -183,10 +184,10 @@ Blue shaded regions indicate the increasing intensity of variolation practices.
 }
 \end{figure}
 
-Our semi-mechanistic SIR model is able to capture the overall epidemic patterns across the 126-year time series, including long-term changes in outbreak magnitude (Figure 2A).
-In particular, we estimate a clear seasonal pattern in transmission, with transmission increasing from the beginning of the year, peaking around week 23, and then gradually decreasing toward the end of the year (Figure 2B).
+Our semi-mechanistic SIR model was able to capture the overall epidemic patterns across the 126-year time series, including long-term changes in outbreak magnitude (Figure 2A).
+In particular, we estimated a clear seasonal pattern in transmission, with transmission increasing from the beginning of the year, peaking around week 23, and then gradually decreasing toward the end of the year (Figure 2B).
 
-We also estimate substantial long-term variation in transmission rates (Figure 2C).
+We also estimated substantial long-term variation in transmission rates (Figure 2C).
 The annual transmission term increased sharply during the 1680s, reaching nearly three times its value in 1670, and then declined to its lowest value around early 1700s.
 Even after the introduction of variolation in 1721, the annual transmission multiplier gradually increased again, reaching almost four times its 1670 value in the late 1760s.
 Despite the continued increase in the intensity of variolation practices, annual transmission remained relatively high throughout the 1770s and 1780s before decreasing rapidly toward the end of the study period.
@@ -198,33 +199,48 @@ This apparent discrepancy suggests that the estimated annual transmission term l
 \includegraphics[width=\textwidth]{../figure_rep/figure_stanfit_rep.pdf}
 \caption{
 \textbf{Summary of simulation-recovery experiments.}
-(A) Comparisons between the assumed (black) and estimated (red) annual transmission rates.
-(B) Mean bias across replicates.
-(C) Mean coverage probability across replicates.
+(A) Comparisons between the assumed (black) and estimated (red) changes in annual transmission rates.
+(B) Mean bias across estimated changes in annual transmission rates for each replicates.
+The black dashed line represents zero bias.
+The red line represents the average value across replicates.
+(C) Mean coverage probability across estimated changes in annual transmission rates for each replicates.
+The black dashed line represents the nominal coverage probability (0.9).
+The red line represents the average value across replicates.
 }
 \end{figure}
 
-The discrepancy between increasing variolation efforts, which we expect to drive reduction in transmission, and the estimated patterns of increasing transmission further raises a question of whether the semi-mechanistic model is able to correctly estimate the underlying transmission pattern.
-Thus, we perform simulation recovery experiments, where we generate 10 synthetic time series using the estimated values and fit the same model to each time series independently (Figure 3).
-We find that our model is able to accurately recover long-term changes in transmission (Figure 3A).
-Across all 10 simulations, the model is able to accurately capture the observed epidemic patterns with $R^2$ values over 0.7 consistently.
-However, our methodology introduces some bias ($\approx 4\%$) and provides low coverage values ($\approx 0.7$).  
+The discrepancy between increasing variolation efforts, which we expected to drive reduction in transmission, and the estimated patterns of increasing transmission further raises a question of whether the semi-mechanistic model is able to correctly estimate the underlying transmission pattern.
+Thus, we performed simulation recovery experiments, where we generated 10 synthetic time series using the estimated values and fitted the same model to each time series independently (Figure 3).
+We found that our model is able to accurately recover long-term changes in transmission (Figure 3A).
+Across all 10 simulations, the model was able to accurately capture the observed epidemic patterns with $R^2$ values over 0.7 consistently.
+However, our methodology introduced some bias ($\approx 4\%$; Figure 3B) and provided low coverage values ($\approx 0.7$; Figure 3C), suggesting overly narrow credible intervals.  
 
 \begin{figure}[!ht]
 \includegraphics[width=\textwidth]{../figure_rep_nc/figure_stanfit_rep_nc.pdf}
 \caption{
 \textbf{Summary of simulation-recovery experiments in the absence of long-term changes in transmission.}
-(A) Comparisons between the assumed (black) and estimated (red) annual transmission rates.
-(B) Mean bias across replicates.
-(C) Mean coverage probability across replicates.
+(A) Comparisons between the assumed (black) and estimated (red) changes in annual transmission rates.
+(B) Mean bias across estimated changes in annual transmission rates for each replicates.
+The black dashed line represents zero bias.
+The red line represents the average value across replicates.
+(C) Mean coverage probability across estimated changes in annual transmission rates for each replicates.
+The black dashed line represents the nominal coverage probability (0.9).
+The red line represents the average value across replicates.
 }
 \end{figure}
 
-As a negative control experiment, we also generate 10 synthetic time series, where the annual term $\delta(t)$ is set to 1, and fit the same model to each time series independently (Figure 4).
-Since we assume random walk priors, the estimated long-term changes in transmission can diverge from zero, although it does not generate any meaningful patterns (Figure 4A).
-For this experiment, the model gives smaller levels of bias ($\approx 2\%$) and high coverage values ($\approx 1$).  
+As a negative control experiment, we also generated 10 synthetic time series, where the annual term $\delta(t)$ is set to 1, and fit the same model to each time series independently (Figure 4).
+Since we assumed random walk priors, the estimated long-term changes in transmission diverged from one, leading up to 20\% estimated changes in transmission rates over 126 years (Figure 4A).
+Despite this divergence, our estimates still did not generate any meaningful patterns and provided high coverage values ($\approx 1$), indicating that credible intervals consistently includes one and that deviation from one is not statistically meaningful (Figure 4C). 
+For this experiment, the model also gave similar but slightly smaller levels of bias ($\approx 2\%$; Figure 4B).
 
 \section*{Discussion}
+
+Here, we developed a Bayesian semi-mechanistic approach for estimating long-term changes in transmission from incidence time series alone.
+We demonstrated its application using historical time series on smallpox deaths and simulations, which span over 120 years. 
+In particular, simulation-recovery experiments demonstrated the feasibility of accurately estimating long-term changes in transmission.
+
+
 
 \section*{Materials and Methods}
 
@@ -328,6 +344,10 @@ To evaluate the ability of a semi-mechanistic model to correctly infer seasonal 
 We then fitted the same model using the same process as outlined above, using 100 random starting values for optimization.
 We repeated the analysis 10 times.
 
+As a negative control, we also simulated the model without long-term changes in transmission rates, thus fixing $\epsilon = 0$. 
+We then fitted the same model using the same process as outlined above, using 100 random starting values for optimization, repeating the analysis 10 times.
+For both simulation studies, we compute relative bias and coverage probabilities (using 90\% credible interval) for the estimated long-term changes in transmission.
+
 \pagebreak
 
 \renewcommand\theequation{S\arabic{equation}}
@@ -351,6 +371,25 @@ We repeated the analysis 10 times.
 \includegraphics[width=\textwidth]{../figure_rep/figure_stanfit_rep_traj_2.pdf}
 \caption{
 \textbf{Summary of comparisons between observed and predicted epidemic trajectories from simulation recovery experiments.}
+}
+\end{figure}
+
+\pagebreak
+
+\begin{figure}[!ht]
+\includegraphics[width=\textwidth]{../figure_rep_nc/figure_stanfit_rep_traj_1.pdf}
+\caption{
+\textbf{Comparisons between observed and predicted epidemic trajectories from simulation recovery experiments in the absence of long-term changes in transmission.}
+}
+\end{figure}
+
+\pagebreak
+
+
+\begin{figure}[!ht]
+\includegraphics[width=\textwidth]{../figure_rep_nc/figure_stanfit_rep_traj_2.pdf}
+\caption{
+\textbf{Summary of comparisons between observed and predicted epidemic trajectories from simulation recovery experiments in the absence of long-term changes in transmission.}
 }
 \end{figure}
 

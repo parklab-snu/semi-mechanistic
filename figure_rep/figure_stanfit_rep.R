@@ -66,7 +66,6 @@ epsilondata <- lapply(1:10, function(x){
   bind_rows
 
 g2 <- ggplot(epsilondata) +
-  geom_vline(xintercept=unique(simulate_rep[[1]][[1]]$year)+1669, lty=3, col="gray70") +
   geom_line(aes(year, exp(est), group=fit), col="#EF6351") +
   geom_line(data=epsilonorig, aes(year, true), lwd=1) +
   scale_x_continuous("Year", expand=c(0, 0)) +
