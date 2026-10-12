@@ -98,7 +98,7 @@
 }
 \newline
 \\
-Sang Woo Park\textsuperscript{1,*}, To be invited (Emily, Bjarke, Wakinyan, and who else?)
+Sang Woo Park\textsuperscript{1,*}, To be invited
 \\
 \bigskip
 \textbf{1} School of Biological Sciences, Seoul National University, Seoul, Korea
@@ -198,18 +198,31 @@ This apparent discrepancy suggests that the estimated annual transmission term l
 \includegraphics[width=\textwidth]{../figure_rep/figure_stanfit_rep.pdf}
 \caption{
 \textbf{Summary of simulation-recovery experiments.}
-(A) Comparisons between the assumed (black) and estimated (red) seasonal transmission rates.
-(B) Comparisons between the assumed (black) and estimated (red) annual transmission rates.
+(A) Comparisons between the assumed (black) and estimated (red) annual transmission rates.
+(B) Mean bias across replicates.
+(C) Mean coverage probability across replicates.
 }
 \end{figure}
 
 The discrepancy between increasing variolation efforts, which we expect to drive reduction in transmission, and the estimated patterns of increasing transmission further raises a question of whether the semi-mechanistic model is able to correctly estimate the underlying transmission pattern.
 Thus, we perform simulation recovery experiments, where we generate 10 synthetic time series using the estimated values and fit the same model to each time series independently (Figure 3).
-We find that our model consistently underestimates seasonal transmission rates (Figure 3A), but is able to accurately recover long-term changes in transmission (Figure 3B).
+We find that our model is able to accurately recover long-term changes in transmission (Figure 3A).
 Across all 10 simulations, the model is able to accurately capture the observed epidemic patterns with $R^2$ values over 0.7 consistently.
+However, our methodology introduces some bias ($\approx 4\%$) and provides low coverage values ($\approx 0.7$).  
 
-As a negative control experiment, we also generate 10 synthetic time series, where the annual term $\delta(t)$ is set to 1, and fit the same model to each time series independently.
+\begin{figure}[!ht]
+\includegraphics[width=\textwidth]{../figure_rep_nc/figure_stanfit_rep_nc.pdf}
+\caption{
+\textbf{Summary of simulation-recovery experiments in the absence of long-term changes in transmission.}
+(A) Comparisons between the assumed (black) and estimated (red) annual transmission rates.
+(B) Mean bias across replicates.
+(C) Mean coverage probability across replicates.
+}
+\end{figure}
 
+As a negative control experiment, we also generate 10 synthetic time series, where the annual term $\delta(t)$ is set to 1, and fit the same model to each time series independently (Figure 4).
+Since we assume random walk priors, the estimated long-term changes in transmission can diverge from zero, although it does not generate any meaningful patterns (Figure 4A).
+For this experiment, the model gives smaller levels of bias ($\approx 2\%$) and high coverage values ($\approx 1$).  
 
 \section*{Discussion}
 

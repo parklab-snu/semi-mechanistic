@@ -1,0 +1,69 @@
+\documentclass[tikz,border=2mm]{standalone}
+
+\usepackage{amsmath}
+\usetikzlibrary{arrows,positioning}
+\usetikzlibrary{fit,backgrounds,decorations.pathreplacing,calc}
+\usepackage{xcolor}
+
+\begin{document}
+
+\definecolor{beige}{RGB}{250,250,230}
+
+\definecolor{softred}{RGB}{232,92,80}
+\definecolor{lightred}{RGB}{255,235,231}
+
+\begin{tikzpicture}[node distance=0.5cm,auto,>=latex',every node/.append style={align=center},int/.style={draw, shape=circle, minimum size=1.3cm, line width=2, fill=beige},inverter/.style={circle,draw,inner sep=2pt,minimum size=6mm},posnode/.style={shape=circle, draw=orange, line width=2},
+paneltitle/.style={font=\sffamily\bfseries\large,anchor=west},
+box/.style={draw=softred,fill=lightred,rounded corners=4pt,line width=1pt,align=center,font=\sffamily\scriptsize,inner sep=5pt},
+  negnode/.style={shape=circle, draw=black, line width=2}]
+  
+  
+  \begin{scope}[shift={(-7,4)}, x=1cm, y=2cm]
+    \node[paneltitle] at (-6.5,2.1) {(A) Observed epidemic and demographic data};
+  
+    \pgfdeclareimage{img1a}{figure_data.pdf}
+    \node (img1a) at (0, 0) {\pgfuseimage{img1a}};
+  \end{scope}
+  
+  \begin{scope}[shift={(-7,-5)}, x=1cm, y=2cm]
+  \node[paneltitle] at (-6.5,2.1) {(B) Semi-mechanistic model};
+  
+  \node(text1) at (-4.8,1.8) [anchor=west] {Seasonal transmission, $s(t)$};
+  \node(text1) at (1.6,1.8) [anchor=west] {Long-term change, $\delta(t)$};
+  
+  \pgfdeclareimage{img1a}{figure_seasonal.pdf}
+  \node (img1a) at (0, 0.9) {\pgfuseimage{img1a}};
+  
+  \draw[decorate,decoration={brace,amplitude=10pt,mirror},line width=1pt]
+  (-2.5,0.15)--(4,0.15) node[midway,below=0cm] {};
+  
+  \node(beta)[box,minimum width=3.2cm] at (0.75,-0.4) {\normalsize Transmission rate\\[5pt]\normalsize$\beta(t)=s(w)\times\delta(t)$};
+  
+  \node(S)[int] at (0.75-4.8,-1.4) {$S$};
+  \node(I)[int] at (0.75,-1.4) {$I$};
+  \node(R)[int] at (0.75+4.8,-1.4) {$R$};
+  
+  \draw[->, line width=1](S) -- node[above] (betalink) {$\beta(t)(I(t)+\omega)/N(0)$} (I);
+  \draw[->, line width=1](I)--node[above]{$\gamma$}(R);
+  
+  \draw[->,softred,line width=1.2pt, dashed] (beta.south) to[out=-90,in=90] (betalink.north);
+  
+  \node[font=\sffamily\small,anchor=east] (births) at ($(S)+(-1.2,0)$)
+    {$b(t)$};
+    
+    \draw[->,densely dashed,line width=0.9]
+    (S.south) -- ++(0,-0.3) node[below] {$d(t)$};
+
+  \draw[->,densely dashed,line width=0.9]
+    (I.south) -- ++(0,-0.3) node[below] {$d(t)$};
+
+  \draw[->,densely dashed,line width=0.9]
+    (R.south) -- ++(0,-0.3) node[below] {$d(t)$};
+  
+  \draw[->, densely dashed,line width=0.9] (births) -- (S);
+
+  
+  \end{scope}
+  
+\end{tikzpicture}
+\end{document}

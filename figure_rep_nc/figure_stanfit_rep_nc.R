@@ -77,6 +77,48 @@ g2 <- ggplot(epsilondata) +
     axis.title.x = element_blank()
   )
 
-gcomb <- ggarrange(g1, g2, nrow=2, labels=c("A", "B"))
+epsiloncover <- merge(
+  epsilonorig,
+  epsilondata
+) %>%
+  mutate(
+    bias = (exp(est)-true)/true,
+    covered = exp(lwr) <= true & true <= exp(upr)
+  ) %>%
+  group_by(fit) %>%
+  summarize(
+    bias=mean(bias),
+    coverage = mean(covered),
+    n = n(),
+    lwr = binom.test(sum(covered), n)[[4]][1],
+    upr = binom.test(sum(covered), n)[[4]][2]
+  )
 
-ggsave("figure_stanfit_rep_nc.pdf", gcomb, width=6, height=4)
+g3 <- ggplot(epsiloncover) +
+  geom_point(aes(factor(fit), bias), col="#EF6351", size=2) +
+  geom_hline(yintercept=0, lty=2) +
+  geom_hline(yintercept=mean(epsiloncover$bias), lty=1, col="#EF6351") +
+  scale_x_discrete("Replicate") +
+  scale_y_continuous("Bias") +
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(linewidth=1)
+  )
+
+g4 <- ggplot(epsiloncover) +
+  geom_point(aes(factor(fit), coverage), col="#EF6351", size=2) +
+  geom_errorbar(aes(factor(fit), ymin=lwr, ymax=upr), width=0, col="#EF6351") +
+  geom_hline(yintercept=0.9, lty=2) +
+  geom_hline(yintercept=mean(epsiloncover$coverage), lty=1, col="#EF6351") +
+  scale_x_discrete("Replicate") +
+  scale_y_continuous("Coverage probability", limits=c(0, 1)) +
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(linewidth=1)
+  )
+
+
+gcomb <- ggarrange(g2, g3, g4, nrow=1, labels=c("A", "B", "C"),
+                   widths=c(3, 1,1))
+
+ggsave("figure_stanfit_rep_nc.pdf", gcomb, width=8, height=2)

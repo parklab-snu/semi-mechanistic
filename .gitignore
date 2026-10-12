@@ -5,3 +5,6 @@
 .DS_Store
 *.rda
 *.csv
+*.log
+*.gz
+*.key
