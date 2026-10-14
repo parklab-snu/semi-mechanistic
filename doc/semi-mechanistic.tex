@@ -383,7 +383,7 @@ D(t) &\sim \textrm{NegBin}(\rho N_{IR}(t), \phi)\\
 \rho &\sim \textrm{Beta}(1,1)\\
 \phi &\sim \textrm{Normal}(100, 20)
 \end{align}
-where $\rho$ represents the infection mortality rate, and $\phi$ represents the overdispersion parameter.
+where $\rho$ represents the fraction of infections recorded as deaths, combining both the infection mortality rate and the reporting rate, and $\phi$ represents the overdispersion parameter.
 Alongside parameters described earlier, we also estimated the initial conditions $S(1670)$ and $I(1670)$ at the beginning of 1670 as well as imported infections $\omega$:
 \begin{align}
 S(1670) &\sim \textrm{Beta}(1, 1)\\
@@ -396,6 +396,14 @@ While this approach enables efficient exploration of high-dimensional parameter 
 During our investigation, we also encountered convergence issues, partly reflecting the sensitivity of HMC sampling to initial conditions.
 Instead, we began with an optimization from 100 random starting values to obtain the maximum a posteriori estimates.
 Then, we used Laplace approximation to obtain approximate posterior distributions.
+
+As a sensitivity analysis, we also considered a version where we allowed $\rho$ to vary over time. Specifically, this was modeled as:
+\begin{align}
+\rho(t) &= \rho_0 \exp\left(k\rho_s (t - 1670) \right)\\
+\rho_0 &\sim \textrm{Beta}(1,1)\\
+\rho_s &\sim \mathrm{Normal}(0,1)
+\end{align}
+where $t$ represents time in years and $k=365/(30000)$ represents a scaling factor to prevent $\rho(t)$ from growing or shrinking too large.
 
 \subsection*{Simulation studies}
 
