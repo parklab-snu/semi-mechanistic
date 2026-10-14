@@ -109,6 +109,14 @@ Sang Woo Park\textsuperscript{1,*}, To be invited
 
 \section*{Abstract}
 
+Understanding how disease transmission changes over time is a key challenge for predicting and preventing future outbreaks.
+However, such efforts are often hampered by the many endogenous and exogenous factors that jointly affect transmission, including host immunity, demography, behavior, environmental conditions, and viral evolution.
+Here, we developed a Bayesian semi-mechanistic approach for jointly estimating seasonal variation and flexible long-term changes in transmission without explicitly specifying these drivers.
+An analysis of historical smallpox mortality data from London spanning more than 120 years suggested that considerable changes in transmission occurred over this period.
+Simulation-recovery experiments demonstrated the feasibility of accurately estimating such changes, although small bias and improper uncertainty quantification remained an issue.
+Allowing for time-varying reporting rate further illustrated that several major temporal features of the estimated trajectory can remain robust, although the magnitude and timing of some changes were sensitive to this assumption.
+Further development of this framework could help test hypotheses about the drivers of long-term changes in disease transmission.
+
 \pagebreak
 
 \section*{Introduction}
@@ -278,10 +286,20 @@ Indeed, we found that the current framework can introduce a small amount of bias
 Other approximations, such as variational inference, can also be explored.
 
 Second, our reporting rate anlysis indicates that the exact transmission trajectory can be sensitive to unedrlying model assumptions.
-Here, we focused on simple sensitivity analysis to demonstrate the feasibility of reconstruction long-term transmission trajectory, but exhaustive modeling effort is needed to assess which of the estimated patterns are real signals, rather than statistical artifacts.
-Thus, while our analysis suggested considerable changes in transmission patterns over the century, we refrained from identifying the drivers of these changes and therefore did not try to interpret resulting estimates.
-Similar limitations have been noted in earlier studies where the estimated change in transmission during the COVID-19 pandemic period did not correlate with the observed mobility patterns \citep{park2024predicting}.
+Here, we focused on simple sensitivity analysis to demonstrate that some temporal patterns can still remain robust, but exhaustive modeling effort is needed to assess which of the estimated patterns are real signals, rather than statistical artifacts.
+Thus, while our analysis suggested considerable changes in transmission patterns over the century, we caution against assigning biological interpretations to these changes without additional evidence.
 
+Finally, identifying the drivers of the estimated transmission trajectory remains a significant challenge for semi-mechanistic models.
+Even when temporal patterns are robust to model assumptions, their underlying causes may remain unclear.
+Such efforts would require detailed data on behavioral and demographic changes over the course of the epidemic, but gathering these data can be particularly challenging for historical epidemics.
+Even when available, these data may not be sufficient to explain the estimated changes in transmission.
+For example, \cite{park2024predicting} noted that estimated changes in transmission of \textit{Mycoplasma pneumoniae} during the COVID-19 pandemic did not correlate with observed mobility patterns.
+Future work should consider incorporating candidate drivers directly into the transmission model alongside flexible terms that capture unexplained variation.
+Despite these limitations, our analysis offers a methodological advancement from current modeling approaches, demonstrating the feasibility of jointly estimating long-term changes in transmission and seasonal variation from an epidemic time series spanning more than a century.
+
+In conclusion, semi-mechanistic models offer a flexible approach for estimating transmission trajectories without explicitly specifying their drivers.
+While several limitations remain, this framework provides a starting point for investigating changes in transmission across different timescales.
+Further development of these approaches could help use long epidemic records to generate and test hypotheses about the mechanisms underlying changes in disease dynamics.
 
 \section*{Materials and Methods}
 
