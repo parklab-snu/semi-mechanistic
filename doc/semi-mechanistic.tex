@@ -169,8 +169,8 @@ Specifically, we decomposed the transmission rate $\beta(t)$ of the classic SIR 
 \beta(t) = \frac{\tsub{\beta}{seas}(t) \delta(t)}{N_{1670}},
 \end{equation}
 where $N_{1670}$ represents the population size at the beginning of 1670, which is included to scale the $\tsub{\beta}{seas}(t)$.
-Note that we are assuming density dependence transmission to account for potential impact of increase in population sizes on transmission.
-For the main analysis, we allowed $\delta(t)$ to vary every year and considered slower variation as a supplementary analysis \swp{TODO}.
+Here, dependence transmission is assumed to account for potential impact of increase in population sizes on transmission.
+The time-varying term $\delta(t)$ was allowed to vary every year.
 Both $\tsub{\beta}{seas}(t)$ and $\delta(t)$ terms were modeled using random walk priors to impose smoothness.
 We then try to fit the resulting SIR model to the time series of smallpox deaths and try to estimate both terms simultaneously using Bayesian inference.
 
