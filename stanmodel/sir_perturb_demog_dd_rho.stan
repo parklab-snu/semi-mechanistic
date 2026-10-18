@@ -28,6 +28,7 @@ transformed parameters {
   vector<lower=0>[N] S;
   vector<lower=0>[N] I;
   vector<lower=0>[N] C;
+  vector<lower=0>[N] beta_eff;
   vector<lower=0>[N] rhovec;
   
   vector[Nyear] epsilon;
@@ -39,13 +40,15 @@ transformed parameters {
   S[1] = S0 * pop[1];
   I[1] = I0 * pop[1];
   C[1] = 0;
+  beta_eff[1] = exp(logbeta[week[1]]+epsilon[year[1]]);
   rhovec[1] = rho0;
   
   for (i in 2:N) {
+    beta_eff[i] = exp(logbeta[week[i]]+epsilon[year[i]]);
+    
     rhovec[i] = rho0 * exp(rhos * (i-1)/30000);
     
-    real beta_eff = exp(logbeta[week[i]]+epsilon[year[i]]);
-    real foi = beta_eff * (I[i-1]+omega)/pop[1];
+    real foi = beta_eff[i] * (I[i-1]+omega)/pop[1];
     real Sout = (1-exp(-(foi+drate[i]))) * S[i-1];
     real StoI = foi/(foi+drate[i]) * Sout;
     real Iout = (1-exp(-(gamma+drate[i]))) * I[i-1];
