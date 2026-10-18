@@ -72,4 +72,3 @@ g2 <- ggplot(fitdata) +
 
 ggsave("figure_stanfit_rep_traj_1.pdf", g1, width=8, height=6)
 ggsave("figure_stanfit_rep_traj_2.pdf", g2, width=8, height=6)
-
