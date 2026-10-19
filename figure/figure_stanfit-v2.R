@@ -1,6 +1,7 @@
 library(dplyr)
 library(ggplot2); theme_set(theme_bw(base_family = "Times"))
 library(egg)
+library(ggsci)
 library(cmdstanr)
 source("../script/script_data.R")
 
@@ -23,11 +24,11 @@ fitdata <- data.frame(
 )
 
 g1 <- ggplot(fitdata) +
-  # annotate("rect", xmin=1721, xmax=1728, ymin=-Inf, ymax=Inf, fill="#D9F2FF") +
-  # annotate("rect", xmin=1728, xmax=1740, ymin=-Inf, ymax=Inf, fill="#AED8EB") +
-  # annotate("rect", xmin=1740, xmax=1768, ymin=-Inf, ymax=Inf, fill="#8FC5DC") +
-  # annotate("rect", xmin=1768, xmax=1790, ymin=-Inf, ymax=Inf, fill="#6EB1CC") +
-  # annotate("rect", xmin=1790, xmax=1796, ymin=-Inf, ymax=Inf, fill="#3F94B6") +
+  annotate("rect", xmin=1721, xmax=1728, ymin=-Inf, ymax=Inf, fill="#D9F2FF", alpha=0.5) +
+  annotate("rect", xmin=1728, xmax=1740, ymin=-Inf, ymax=Inf, fill="#AED8EB", alpha=0.5) +
+  annotate("rect", xmin=1740, xmax=1768, ymin=-Inf, ymax=Inf, fill="#8FC5DC", alpha=0.5) +
+  annotate("rect", xmin=1768, xmax=1790, ymin=-Inf, ymax=Inf, fill="#6EB1CC", alpha=0.5) +
+  annotate("rect", xmin=1790, xmax=1796, ymin=-Inf, ymax=Inf, fill="#3F94B6", alpha=0.5) +
   # geom_vline(xintercept=unique(data_filter$year), lty=3, col="gray70") +
   geom_point(data=data_filter, aes(year+week/52, smpx), size=0.3) +
   geom_ribbon(aes(year+week/52, ymin=lwr, ymax=upr, fill="Random walk priors"), alpha=0.4) +
@@ -36,13 +37,14 @@ g1 <- ggplot(fitdata) +
   geom_line(aes(year+week/52, est2, col="Independent priors")) +
   scale_x_continuous("Year", expand=c(0, 0)) +
   scale_y_continuous("Weekly deaths", expand=c(0, 0), limits=c(0, 190)) +
-  scale_color_discrete("") +
-  scale_fill_discrete("") +
+  scale_color_manual("", values=ggsci::pal_aaas()(3)[2:3]) +
+  scale_fill_manual("", values=ggsci::pal_aaas()(3)[2:3]) +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(linewidth=1),
     axis.title.x = element_blank(),
-    legend.position = "top"
+    legend.position = "top",
+    legend.title = element_blank()
   )
 
 ggplot(fitdata) +
@@ -66,7 +68,7 @@ betadata <- data.frame(
   upr2=exp(summary_sir_perturb_demog_dd_norw_cmdstanr_laplace$q95[grepl("logbeta\\[", summary_sir_perturb_demog_dd_norw_cmdstanr_laplace$variable)])
 )
 
-ggplot(betadata) +
+g2 <- ggplot(betadata) +
   geom_ribbon(aes(week, ymin=lwr, ymax=upr, fill="Random walk priors"), alpha=0.4) +
   geom_line(aes(week, est, col="Random walk priors")) +
   geom_ribbon(aes(week, ymin=lwr2, ymax=upr2, fill="Independent priors"), alpha=0.4) +
@@ -75,10 +77,13 @@ ggplot(betadata) +
                      breaks=c(1, 11, 21, 31, 41, 51),
                      labels=c("Wk 1", "Wk 11", "Wk 21", "Wk 31", "Wk 41", "Wk 51")) +
   scale_y_continuous("Transmission rate\n(1/week)") +
+  scale_color_manual("", values=ggsci::pal_aaas()(3)[2:3]) +
+  scale_fill_manual("", values=ggsci::pal_aaas()(3)[2:3]) +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(linewidth=1),
-    axis.title.x = element_blank()
+    axis.title.x = element_blank(),
+    legend.position = "none"
   )
 
 epsilondata <- data.frame(
@@ -91,7 +96,12 @@ epsilondata <- data.frame(
   upr2=summary_sir_perturb_demog_dd_norw_cmdstanr_laplace$q95[grepl("^epsilon\\[", summary_sir_perturb_demog_dd_norw_cmdstanr_laplace$variable)]
 )
 
-ggplot(epsilondata) +
+g3 <- ggplot(epsilondata) +
+  annotate("rect", xmin=1721, xmax=1728, ymin=0.45, ymax=Inf, fill="#D9F2FF", alpha=0.5) +
+  annotate("rect", xmin=1728, xmax=1740, ymin=0.45, ymax=Inf, fill="#AED8EB", alpha=0.5) +
+  annotate("rect", xmin=1740, xmax=1768, ymin=0.45, ymax=Inf, fill="#8FC5DC", alpha=0.5) +
+  annotate("rect", xmin=1768, xmax=1790, ymin=0.45, ymax=Inf, fill="#6EB1CC", alpha=0.5) +
+  annotate("rect", xmin=1790, xmax=1796, ymin=0.45, ymax=Inf, fill="#3F94B6", alpha=0.5) +
   geom_ribbon(aes(year, ymin=exp(lwr), ymax=exp(upr), fill="Random walk priors"), alpha=0.4) +
   geom_line(aes(year, exp(est), col="Random walk priors")) +
   geom_ribbon(aes(year, ymin=exp(lwr2), ymax=exp(upr2), fill="Independent priors"), alpha=0.4) +
@@ -101,13 +111,49 @@ ggplot(epsilondata) +
   scale_y_log10("Multiplicative\nchanges in\ntransmission",
                 breaks=c(0.5, 1, 2, 4), limits=c(0.45, 4.5), expand=c(0, 0),
                 labels=c("1/2", "1", "2", "4")) +
+  scale_color_manual("", values=ggsci::pal_aaas()(3)[2:3]) +
+  scale_fill_manual("", values=ggsci::pal_aaas()(3)[2:3]) +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(linewidth=1),
-    axis.title.x = element_blank()
+    axis.title.x = element_blank(),
+    legend.position = "none"
   )
 
-gcomb <- ggarrange(g1, g2, g3, nrow=3,
-                   labels=c("A", "B", "C"))
+Sdata <- data.frame(
+  year=data_filter$year,
+  week=data_filter$week,
+  est=summary_sir_perturb_demog_dd_cmdstanr_laplace$median[grepl("^S\\[", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)]/data_filter$population,
+  lwr=summary_sir_perturb_demog_dd_cmdstanr_laplace$q5[grepl("^S\\[", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)]/data_filter$population,
+  upr=summary_sir_perturb_demog_dd_cmdstanr_laplace$q95[grepl("^S\\[", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)]/data_filter$population,
+  est2=summary_sir_perturb_demog_dd_norw_cmdstanr_laplace$median[grepl("^S\\[", summary_sir_perturb_demog_dd_norw_cmdstanr_laplace$variable)]/data_filter$population,
+  lwr2=summary_sir_perturb_demog_dd_norw_cmdstanr_laplace$q5[grepl("^S\\[", summary_sir_perturb_demog_dd_norw_cmdstanr_laplace$variable)]/data_filter$population,
+  upr2=summary_sir_perturb_demog_dd_norw_cmdstanr_laplace$q95[grepl("^S\\[", summary_sir_perturb_demog_dd_norw_cmdstanr_laplace$variable)]/data_filter$population
+)
 
-ggsave("figure_stanfit.pdf", gcomb, width=6, height=6)
+g4 <- ggplot(Sdata) +
+  annotate("rect", xmin=1721, xmax=1728, ymin=-Inf, ymax=Inf, fill="#D9F2FF", alpha=0.5) +
+  annotate("rect", xmin=1728, xmax=1740, ymin=-Inf, ymax=Inf, fill="#AED8EB", alpha=0.5) +
+  annotate("rect", xmin=1740, xmax=1768, ymin=-Inf, ymax=Inf, fill="#8FC5DC", alpha=0.5) +
+  annotate("rect", xmin=1768, xmax=1790, ymin=-Inf, ymax=Inf, fill="#6EB1CC", alpha=0.5) +
+  annotate("rect", xmin=1790, xmax=1796, ymin=-Inf, ymax=Inf, fill="#3F94B6", alpha=0.5) +
+  geom_ribbon(aes(year+week/52, ymin=(lwr), ymax=(upr), fill="Random walk priors"), alpha=0.4) +
+  geom_line(aes(year+week/52, (est), col="Random walk priors")) +
+  geom_ribbon(aes(year+week/52, ymin=(lwr2), ymax=(upr2), fill="Independent priors"), alpha=0.4) +
+  geom_line(aes(year+week/52, (est2), col="Independent priors")) +
+  scale_x_continuous("Year", expand=c(0, 0)) +
+  scale_y_continuous("Proportion\nsusceptible", breaks=c(0, 0.1, 0.2, 0.3), limits=c(0, 0.3),
+                     expand=c(0, 0)) +
+  scale_color_manual("", values=ggsci::pal_aaas()(3)[2:3]) +
+  scale_fill_manual("", values=ggsci::pal_aaas()(3)[2:3]) +
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(linewidth=1),
+    axis.title.x = element_blank(),
+    legend.position = "none"
+  )
+
+gcomb <- ggarrange(g1, g2, g3, g4,  ncol=1,
+                   labels=c("A", "B", "C", "D"))
+
+ggsave("figure_stanfit-v2.pdf", gcomb, width=6, height=8)
