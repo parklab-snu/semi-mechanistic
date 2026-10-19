@@ -55,6 +55,7 @@ g1 <- ggplot(fitdata) +
   scale_y_continuous("Weekly deaths", expand=c(0, 0), limits=c(0, 260)) +
   scale_color_manual("", values=ggsci::pal_nejm()(5)[1:4]) +
   scale_fill_manual("", values=ggsci::pal_nejm()(5)[1:4]) +
+  guides(color=guide_legend(nrow=2,byrow=TRUE), fill=guide_legend(nrow=2,byrow=TRUE)) +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(linewidth=1),
@@ -160,4 +161,4 @@ Sdata <- lapply(all_summ, function(x) {
 gcomb <- ggarrange(g1, g2, g3,  ncol=1,
                    labels=c("A", "B", "C"))
 
-ggsave("figure_stanfit-v2.pdf", gcomb, width=6, height=8)
+ggsave("figure_stanfit-v2.pdf", gcomb, width=6, height=6)

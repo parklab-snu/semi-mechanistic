@@ -191,7 +191,6 @@ g3 <- ggplot(coverdata_all) +
 
 g4 <- ggplot(coverdata_all) +
   geom_point(aes(year, coverage, col=group)) +
-  geom_smooth(aes(year, coverage, col=group, fill=group), method="gam") +
   geom_hline(yintercept=0.9, col="black", lty=2) +
   # geom_hline(yintercept=mean(coverdata$coverage), lty=2, col=ggsci::pal_nejm()(3)[3], linewidth=1) +
   # geom_hline(yintercept=mean(coverdata_norw$coverage), lty=2, col=ggsci::pal_nejm()(3)[1], linewidth=1) +
