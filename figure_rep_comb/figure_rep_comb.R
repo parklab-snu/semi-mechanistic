@@ -125,7 +125,7 @@ g3 <- plot_fit("beff") +
                 breaks=c(1, 2, 4, 8), limits=c(1, 8))
 
 g4 <- ggplot(coverdata) +
-  geom_point(aes(year, bias, col=group)) +
+  geom_point(aes(year, bias, col=group), size=0.5) +
   geom_errorbar(aes(year, ymin=bias_lwr, ymax=bias_upr, col=group), width=0) +
   geom_hline(yintercept=0, lty=2) +
   geom_hline(data=covermean, aes(yintercept=bias, col=group), lty=3) +
@@ -134,7 +134,7 @@ g4 <- ggplot(coverdata) +
   common
 
 g5 <- ggplot(coverdata) +
-  geom_point(aes(year, coverage, col=group)) +
+  geom_point(aes(year, coverage, col=group), size=0.5) +
   geom_hline(yintercept=0.9, lty=2) +
   geom_hline(data=covermean, aes(yintercept=coverage, col=group), lty=3) +
   scale_x_continuous("Year", expand=c(0, 0)) +
@@ -143,4 +143,4 @@ g5 <- ggplot(coverdata) +
 
 gcomb <- ggarrange(g1, g2, g3, g4, g5, ncol=1, labels=c("A", "B", "C", "D", "E"))
 
-ggsave("figure_rep_comb.pdf", gcomb, width=8, height=8)
+ggsave("figure_rep_comb.pdf", gcomb, width=10, height=8)

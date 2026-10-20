@@ -58,7 +58,31 @@ g2 <- ggplot(rhodata) +
     axis.title.x = element_blank()
   )
 
-gcomb <- ggarrange(g2, g1, ncol=1,
-                   labels=c("A", "B"))
+Sdata <- data.frame(
+  year=data_filter$year,
+  week=data_filter$week,
+  est=summary_sir_perturb_demog_dd_cmdstanr_laplace$median[grepl("^S\\[", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)],
+  lwr=summary_sir_perturb_demog_dd_cmdstanr_laplace$q5[grepl("^S\\[", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)],
+  upr=summary_sir_perturb_demog_dd_cmdstanr_laplace$q95[grepl("^S\\[", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)],
+  est2=summary_sir_perturb_demog_dd_cmdstanr_rho_laplace$median[grepl("^S\\[", summary_sir_perturb_demog_dd_cmdstanr_rho_laplace$variable)],
+  lwr2=summary_sir_perturb_demog_dd_cmdstanr_rho_laplace$q5[grepl("^S\\[", summary_sir_perturb_demog_dd_cmdstanr_rho_laplace$variable)],
+  upr2=summary_sir_perturb_demog_dd_cmdstanr_rho_laplace$q95[grepl("^S\\[", summary_sir_perturb_demog_dd_cmdstanr_rho_laplace$variable)]
+)
 
-ggsave("figure_stanfit_rho.pdf", gcomb, width=6, height=4)
+g3 <- ggplot(Sdata) +
+  geom_ribbon(aes(year+week/52, ymin=(lwr), ymax=(upr)), fill=colors_default[3], alpha=0.4) +
+  geom_line(aes(year+week/52, (est)), col=colors_default[3]) +
+  geom_ribbon(aes(year+week/52, ymin=(lwr2), ymax=(upr2)), fill=colors_new[1], alpha=0.4) +
+  geom_line(aes(year+week/52, (est2)), col=colors_new[1]) +
+  scale_x_continuous("Year", expand=c(0, 0)) +
+  scale_y_continuous("Susceptible population") +
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(linewidth=1),
+    axis.title.x = element_blank()
+  )
+
+gcomb <- ggarrange(g2, g1, g3, ncol=1,
+                   labels=c("A", "B", "C"))
+
+ggsave("figure_stanfit_rho.pdf", gcomb, width=6, height=6)

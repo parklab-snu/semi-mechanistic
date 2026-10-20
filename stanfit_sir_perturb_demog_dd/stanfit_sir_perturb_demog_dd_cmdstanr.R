@@ -77,7 +77,7 @@ plot(exp(dd[grepl("^epsilon\\[", colnames(dd))]), type="l")
 
 dd[grepl("sigma_epsilon", colnames(dd))]
 
-plot(exp(dd[grepl("beta\\[", colnames(dd))])*3, type="l")    
+plot((dd[grepl("beta\\[", colnames(dd))])*3, type="l")    
 
 plot(dd[grepl("beta_eff\\[", colnames(dd))], type="l")    
 plot(dd[grepl("S\\[", colnames(dd))]/data_filter$population, type="l")    
