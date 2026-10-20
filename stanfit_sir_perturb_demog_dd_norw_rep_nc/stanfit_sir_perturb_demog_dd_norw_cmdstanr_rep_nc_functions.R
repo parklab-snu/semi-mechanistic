@@ -1,4 +1,4 @@
-sir_default_ncores <- function() {
+sir_norw_default_ncores <- function() {
   requested <- suppressWarnings(as.integer(Sys.getenv("SIR_NCORES", "")))
   if (length(requested) == 1L && !is.na(requested) && requested > 0L) {
     return(requested)
@@ -15,7 +15,7 @@ sir_default_ncores <- function() {
   max(1L, min(4L, available))
 }
 
-run_one <- function(i, model, standata, iter = 1e4) {
+run_one_norw <- function(i, model, standata, iter = 1e4) {
   fit <- try(
     model$optimize(
       data = standata,
@@ -43,10 +43,10 @@ run_one <- function(i, model, standata, iter = 1e4) {
   data.frame(seed = i, value = lp)
 }
 
-run_parallel_optimizations <- function(model,
+run_parallel_optimizations_norw <- function(model,
                                        standata,
                                        nfit = 100L,
-                                       ncores = sir_default_ncores(),
+                                       ncores = sir_norw_default_ncores(),
                                        iter = 1e4) {
   nfit <- as.integer(nfit)
   ncores <- min(as.integer(ncores), nfit)
@@ -56,12 +56,12 @@ run_parallel_optimizations <- function(model,
   }
 
   seeds <- seq_len(nfit)
-  run_seed <- function(i) run_one(i, model, standata, iter)
+  run_seed_norw <- function(i) run_one_norw(i, model, standata, iter)
 
   if (ncores > 1L && .Platform$OS.type != "windows") {
     reslist <- parallel::mclapply(
       seeds,
-      run_seed,
+      run_seed_norw,
       mc.cores = ncores,
       mc.preschedule = FALSE
     )
@@ -69,7 +69,7 @@ run_parallel_optimizations <- function(model,
     if (ncores > 1L) {
       warning("Parallel optimization is not available on Windows; running sequentially")
     }
-    reslist <- lapply(seeds, run_seed)
+    reslist <- lapply(seeds, run_seed_norw)
   }
 
   reslist <- Filter(Negate(is.null), reslist)
@@ -81,13 +81,13 @@ run_parallel_optimizations <- function(model,
   optim[order(optim$seed), , drop = FALSE]
 }
 
-fit_sir_perturb_demog_dd_rep_nc <- function(
+fit_sir_perturb_demog_dd_norw_rep_nc <- function(
     rep_id,
     nfit = 100L,
-    ncores = sir_default_ncores(),
+    ncores = sir_norw_default_ncores(),
     iter = 1e4,
     data_file = "../simulate/simulate_rep_nochange.rda",
-    stan_file = "../stanmodel/sir_perturb_demog_dd.stan",
+    stan_file = "../stanmodel/sir_perturb_demog_dd_norw.stan",
     output_dir = ".") {
   rep_id <- as.integer(rep_id)
   if (length(rep_id) != 1L || is.na(rep_id) || rep_id < 1L) {
@@ -130,7 +130,7 @@ fit_sir_perturb_demog_dd_rep_nc <- function(
     nfit,
     ncores
   ))
-  optim <- run_parallel_optimizations(
+  optim <- run_parallel_optimizations_norw(
     model = model,
     standata = standata,
     nfit = nfit,
@@ -175,15 +175,15 @@ fit_sir_perturb_demog_dd_rep_nc <- function(
   laplace_summary <- laplace_fit$summary()
 
   optim_name <- sprintf(
-    "stanfit_sir_perturb_demog_dd_cmdstanr_optim_rep_nc%d",
+    "stanfit_sir_perturb_demog_dd_norw_cmdstanr_optim_rep_nc%d",
     rep_id
   )
   laplace_name <- sprintf(
-    "stanfit_sir_perturb_demog_dd_cmdstanr_laplace_rep_nc%d",
+    "stanfit_sir_perturb_demog_dd_norw_cmdstanr_laplace_rep_nc%d",
     rep_id
   )
   summary_name <- sprintf(
-    "summary_sir_perturb_demog_dd_cmdstanr_laplace_rep_nc%d",
+    "summary_sir_perturb_demog_dd_norw_cmdstanr_laplace_rep_nc%d",
     rep_id
   )
 
@@ -195,7 +195,7 @@ fit_sir_perturb_demog_dd_rep_nc <- function(
 
   output_file <- file.path(
     output_dir,
-    sprintf("stanfit_sir_perturb_demog_dd_cmdstanr_rep_nc%d.rda", rep_id)
+    sprintf("stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep_nc%d.rda", rep_id)
   )
   save(list = names(results), envir = .GlobalEnv, file = output_file)
   message("Saved ", output_file)
