@@ -3,36 +3,36 @@ library(ggplot2); theme_set(theme_bw(base_family = "Times"))
 library(egg)
 library(cmdstanr)
 library(gridExtra)
-load("../simulate/simulate_rep.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep1.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep2.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep3.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep4.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep5.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep6.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep7.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep8.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep9.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep10.rda")
+load("../simulate/simulate_rep_nochange.rda")
+load("../stanfit_sir_perturb_demog_dd_rep_nc/stanfit_sir_perturb_demog_dd_cmdstanr_rep_nc1.rda")
+load("../stanfit_sir_perturb_demog_dd_rep_nc/stanfit_sir_perturb_demog_dd_cmdstanr_rep_nc2.rda")
+load("../stanfit_sir_perturb_demog_dd_rep_nc/stanfit_sir_perturb_demog_dd_cmdstanr_rep_nc3.rda")
+load("../stanfit_sir_perturb_demog_dd_rep_nc/stanfit_sir_perturb_demog_dd_cmdstanr_rep_nc4.rda")
+load("../stanfit_sir_perturb_demog_dd_rep_nc/stanfit_sir_perturb_demog_dd_cmdstanr_rep_nc5.rda")
+load("../stanfit_sir_perturb_demog_dd_rep_nc/stanfit_sir_perturb_demog_dd_cmdstanr_rep_nc6.rda")
+load("../stanfit_sir_perturb_demog_dd_rep_nc/stanfit_sir_perturb_demog_dd_cmdstanr_rep_nc7.rda")
+load("../stanfit_sir_perturb_demog_dd_rep_nc/stanfit_sir_perturb_demog_dd_cmdstanr_rep_nc8.rda")
+load("../stanfit_sir_perturb_demog_dd_rep_nc/stanfit_sir_perturb_demog_dd_cmdstanr_rep_nc9.rda")
+load("../stanfit_sir_perturb_demog_dd_rep_nc/stanfit_sir_perturb_demog_dd_cmdstanr_rep_nc10.rda")
 
-load("../stanfit_sir_perturb_demog_dd_norw_rep/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep1.rda")
-load("../stanfit_sir_perturb_demog_dd_norw_rep/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep2.rda")
-load("../stanfit_sir_perturb_demog_dd_norw_rep/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep3.rda")
-load("../stanfit_sir_perturb_demog_dd_norw_rep/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep4.rda")
-load("../stanfit_sir_perturb_demog_dd_norw_rep/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep5.rda")
-load("../stanfit_sir_perturb_demog_dd_norw_rep/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep6.rda")
-load("../stanfit_sir_perturb_demog_dd_norw_rep/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep7.rda")
-load("../stanfit_sir_perturb_demog_dd_norw_rep/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep8.rda")
-load("../stanfit_sir_perturb_demog_dd_norw_rep/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep9.rda")
-load("../stanfit_sir_perturb_demog_dd_norw_rep/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep10.rda")
+load("../stanfit_sir_perturb_demog_dd_norw_rep_nc/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep_nc1.rda")
+load("../stanfit_sir_perturb_demog_dd_norw_rep_nc/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep_nc2.rda")
+load("../stanfit_sir_perturb_demog_dd_norw_rep_nc/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep_nc3.rda")
+load("../stanfit_sir_perturb_demog_dd_norw_rep_nc/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep_nc4.rda")
+load("../stanfit_sir_perturb_demog_dd_norw_rep_nc/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep_nc5.rda")
+load("../stanfit_sir_perturb_demog_dd_norw_rep_nc/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep_nc6.rda")
+load("../stanfit_sir_perturb_demog_dd_norw_rep_nc/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep_nc7.rda")
+load("../stanfit_sir_perturb_demog_dd_norw_rep_nc/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep_nc8.rda")
+load("../stanfit_sir_perturb_demog_dd_norw_rep_nc/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep_nc9.rda")
+load("../stanfit_sir_perturb_demog_dd_norw_rep_nc/stanfit_sir_perturb_demog_dd_norw_cmdstanr_rep_nc10.rda")
 
 betaorig <- data.frame(
   week=1:52,
-  true=exp(simulate_rep[[1]]$logbeta)
+  true=exp(simulate_rep_nochange[[1]]$logbeta)
 )
 
 betadata <- lapply(1:10, function(x){
-  dd <- get(paste0("summary_sir_perturb_demog_dd_cmdstanr_laplace_rep", x))
+  dd <- get(paste0("summary_sir_perturb_demog_dd_cmdstanr_laplace_rep_nc", x))
   
   data.frame(
     week=1:52,
@@ -45,7 +45,7 @@ betadata <- lapply(1:10, function(x){
   bind_rows
 
 betadata_norw <- lapply(1:10, function(x){
-  dd <- get(paste0("summary_sir_perturb_demog_dd_norw_cmdstanr_laplace_rep", x))
+  dd <- get(paste0("summary_sir_perturb_demog_dd_norw_cmdstanr_laplace_rep_nc", x))
   
   data.frame(
     week=1:52,
@@ -78,15 +78,15 @@ g1 <- ggplot(betadata_all) +
   )
 
 epsilonorig <- data.frame(
-  year=unique(simulate_rep[[1]][[1]]$year)+1669,
-  true=exp(simulate_rep[[1]]$epsilon)
+  year=unique(simulate_rep_nochange[[1]][[1]]$year)+1669,
+  true=exp(simulate_rep_nochange[[1]]$epsilon)
 )
 
 epsilondata <- lapply(1:10, function(x){
-  dd <- get(paste0("summary_sir_perturb_demog_dd_cmdstanr_laplace_rep", x))
+  dd <- get(paste0("summary_sir_perturb_demog_dd_cmdstanr_laplace_rep_nc", x))
   
   data.frame(
-    year=unique(simulate_rep[[1]][[1]]$year)+1669,
+    year=unique(simulate_rep_nochange[[1]][[1]]$year)+1669,
     fit=x,
     est=(dd$median[grepl("^epsilon\\[", dd$variable)]),
     lwr=(dd$q5[grepl("^epsilon\\[", dd$variable)]),
@@ -96,10 +96,10 @@ epsilondata <- lapply(1:10, function(x){
   bind_rows
 
 epsilondata_norw <- lapply(1:10, function(x){
-  dd <- get(paste0("summary_sir_perturb_demog_dd_norw_cmdstanr_laplace_rep", x))
+  dd <- get(paste0("summary_sir_perturb_demog_dd_norw_cmdstanr_laplace_rep_nc", x))
   
   data.frame(
-    year=unique(simulate_rep[[1]][[1]]$year)+1669,
+    year=unique(simulate_rep_nochange[[1]][[1]]$year)+1669,
     fit=x,
     est=(dd$median[grepl("^epsilon\\[", dd$variable)]),
     lwr=(dd$q5[grepl("^epsilon\\[", dd$variable)]),
@@ -128,6 +128,8 @@ g2 <- ggplot(epsilondata_all) +
     axis.title.x = element_blank(),
     legend.position = "none"
   )
+
+
 
 coverdata <- merge(
   epsilonorig,
@@ -207,4 +209,4 @@ g4 <- ggplot(coverdata_all) +
 
 gcomb <- ggarrange(g1, g2, g3, g4, ncol=1, labels=c("A", "B", "C", "D"))
 
-ggsave("figure_stanfit_rep-v2.pdf", gcomb, width=8, height=8)
+ggsave("figure_stanfit_rep_nc-v2.pdf", gcomb, width=8, height=8)
