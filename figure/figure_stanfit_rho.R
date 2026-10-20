@@ -3,6 +3,7 @@ library(ggplot2); theme_set(theme_bw(base_family = "Times"))
 library(egg)
 library(cmdstanr)
 source("../script/script_data.R")
+source("../R/colors.R")
 
 load("../stanfit_sir_perturb_demog_dd/stanfit_sir_perturb_demog_dd_cmdstanr.rda")
 load("../stanfit_sir_perturb_demog_dd/stanfit_sir_perturb_demog_dd_cmdstanr_rho.rda")
@@ -21,10 +22,10 @@ epsilondata <- data.frame(
 )
 
 g1 <- ggplot(epsilondata) +
-  geom_ribbon(aes(year, ymin=exp(lwr), ymax=exp(upr)), fill="#EF6351", alpha=0.4) +
-  geom_line(aes(year, exp(est)), col="#EF6351") +
-  geom_ribbon(aes(year, ymin=exp(lwr2), ymax=exp(upr2)), fill="#016FB9", alpha=0.4) +
-  geom_line(aes(year, exp(est2)), col="#016FB9") +
+  geom_ribbon(aes(year, ymin=exp(lwr), ymax=exp(upr)), fill=colors_default[3], alpha=0.4) +
+  geom_line(aes(year, exp(est)), col=colors_default[3]) +
+  geom_ribbon(aes(year, ymin=exp(lwr2), ymax=exp(upr2)), fill=colors_new[1], alpha=0.4) +
+  geom_line(aes(year, exp(est2)), col=colors_new[1]) +
   scale_x_continuous("Year", expand=c(0, 0)) +
   scale_y_continuous("Multiplicative changes\nin transmission") +
   theme(
@@ -45,10 +46,10 @@ rhodata <- data.frame(
 )
 
 g2 <- ggplot(rhodata) +
-  geom_ribbon(aes(year+week/52, ymin=(lwr), ymax=(upr)), fill="#EF6351", alpha=0.4) +
-  geom_line(aes(year+week/52, (est)), col="#EF6351") +
-  geom_ribbon(aes(year+week/52, ymin=(lwr2), ymax=(upr2)), fill="#016FB9", alpha=0.4) +
-  geom_line(aes(year+week/52, (est2)), col="#016FB9") +
+  geom_ribbon(aes(year+week/52, ymin=(lwr), ymax=(upr)), fill=colors_default[3], alpha=0.4) +
+  geom_line(aes(year+week/52, (est)), col=colors_default[3]) +
+  geom_ribbon(aes(year+week/52, ymin=(lwr2), ymax=(upr2)), fill=colors_new[1], alpha=0.4) +
+  geom_line(aes(year+week/52, (est2)), col=colors_new[1]) +
   scale_x_continuous("Year", expand=c(0, 0)) +
   scale_y_continuous("Reporting rate") +
   theme(
