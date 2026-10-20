@@ -3,6 +3,8 @@ library(ggplot2); theme_set(theme_bw(base_family = "Times"))
 library(egg)
 library(cmdstanr)
 library(gridExtra)
+source("../R/colors.R")
+
 load("../simulate/simulate_rep_nochange.rda")
 load("../stanfit_sir_perturb_demog_dd_rep_nc/stanfit_sir_perturb_demog_dd_cmdstanr_rep_nc1.rda")
 load("../stanfit_sir_perturb_demog_dd_rep_nc/stanfit_sir_perturb_demog_dd_cmdstanr_rep_nc2.rda")
@@ -65,7 +67,7 @@ betadata_all <- bind_rows(
 g1 <- ggplot(betadata_all) +
   geom_line(aes(week, est, group=interaction(fit, group), col=group)) +
   geom_line(data=betaorig, aes(week, true), lwd=1) +
-  scale_color_manual("", values=ggsci::pal_nejm()(5)[c(1,3)]) +
+  scale_color_manual("", values=colors_default[c(1,3)]) +
   scale_x_continuous("Week of year", expand=c(0, 0),
                      breaks=c(1, 11, 21, 31, 41, 51),
                      labels=c("Wk 1", "Wk 11", "Wk 21", "Wk 31", "Wk 41", "Wk 51")) +
@@ -121,14 +123,13 @@ g2 <- ggplot(epsilondata_all) +
   scale_y_log10("Multiplicative\nchanges in\ntransmission",
                 breaks=c(0.5, 1, 2, 4), limits=c(0.45, 4.5), expand=c(0, 0),
                 labels=c("1/2", "1", "2", "4")) +
-  scale_color_manual("", values=ggsci::pal_nejm()(5)[c(1,3)]) +
+  scale_color_manual("", values=colors_default[c(1,3)]) +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(linewidth=1),
     axis.title.x = element_blank(),
     legend.position = "none"
   )
-
 
 
 coverdata <- merge(
@@ -182,8 +183,8 @@ g3 <- ggplot(coverdata_all) +
   # geom_hline(yintercept=mean(coverdata_norw$bias), lty=2, col=ggsci::pal_nejm()(3)[1], linewidth=1) +
   scale_x_continuous("Year", expand=c(0, 0)) +
   scale_y_continuous("Relative bias") +
-  scale_color_manual("", values=ggsci::pal_nejm()(5)[c(1,3)]) +
-  scale_fill_manual("", values=ggsci::pal_nejm()(5)[c(1,3)]) +
+  scale_color_manual("", values=colors_default[c(1,3)]) +
+  scale_fill_manual("", values=colors_default[c(1,3)]) +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(linewidth=1),
@@ -198,8 +199,8 @@ g4 <- ggplot(coverdata_all) +
   # geom_hline(yintercept=mean(coverdata_norw$coverage), lty=2, col=ggsci::pal_nejm()(3)[1], linewidth=1) +
   scale_x_continuous("Year", expand=c(0, 0)) +
   scale_y_continuous("Coverage") +
-  scale_color_manual("", values=ggsci::pal_nejm()(5)[c(1,3)]) +
-  scale_fill_manual("", values=ggsci::pal_nejm()(5)[c(1,3)]) +
+  scale_color_manual("", values=colors_default[c(1,3)]) +
+  scale_fill_manual("", values=colors_default[c(1,3)]) +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(linewidth=1),

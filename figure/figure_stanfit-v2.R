@@ -4,6 +4,7 @@ library(egg)
 library(ggsci)
 library(cmdstanr)
 source("../script/script_data.R")
+source("../R/colors.R")
 
 load("../stanfit_sir_perturb_demog_dd/stanfit_sir_perturb_demog_dd_cmdstanr.rda")
 load("../stanfit_sir_perturb_demog_dd/stanfit_sir_perturb_demog_dd_wide_cmdstanr.rda")
@@ -53,8 +54,8 @@ g1 <- ggplot(fitdata) +
   geom_line(aes(year+week/52, est, col=group)) +
   scale_x_continuous("Year", expand=c(0, 0)) +
   scale_y_continuous("Weekly deaths", expand=c(0, 0), limits=c(0, 260)) +
-  scale_color_manual("", values=ggsci::pal_nejm()(5)[1:4]) +
-  scale_fill_manual("", values=ggsci::pal_nejm()(5)[1:4]) +
+  scale_color_manual("", values=colors_default) +
+  scale_fill_manual("", values=colors_default) +
   guides(color=guide_legend(nrow=2,byrow=TRUE), fill=guide_legend(nrow=2,byrow=TRUE)) +
   theme(
     panel.grid = element_blank(),
@@ -91,8 +92,8 @@ g2 <- ggplot(betadata) +
                      breaks=c(1, 11, 21, 31, 41, 51),
                      labels=c("Wk 1", "Wk 11", "Wk 21", "Wk 31", "Wk 41", "Wk 51")) +
   scale_y_continuous("Transmission rate\n(1/week)") +
-  scale_color_manual("", values=ggsci::pal_nejm()(5)[1:4]) +
-  scale_fill_manual("", values=ggsci::pal_nejm()(5)[1:4]) +
+  scale_color_manual("", values=colors_default) +
+  scale_fill_manual("", values=colors_default) +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(linewidth=1),
@@ -128,8 +129,8 @@ g3 <- ggplot(epsilondata) +
                 breaks=c(0.5, 1, 2, 4), limits=c(0.45, 4.5), expand=c(0, 0),
                 labels=c("1/2", "1", "2", "4")) +
   geom_hline(yintercept=1, lty=2) +
-  scale_color_manual("", values=ggsci::pal_nejm()(5)[1:4]) +
-  scale_fill_manual("", values=ggsci::pal_nejm()(5)[1:4]) +
+  scale_color_manual("", values=colors_default) +
+  scale_fill_manual("", values=colors_default) +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(linewidth=1),
