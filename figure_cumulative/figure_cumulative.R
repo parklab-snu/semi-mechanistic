@@ -3,7 +3,7 @@ library(ggplot2); theme_set(theme_bw(base_family = "Times"))
 library(egg)
 source("../script/script_data.R")
 
-files <- list.files("../stanfit_cumulative", pattern="^stanfit_cumulative_[0-9]+\\.rda$",
+files <- list.files("../stanfit_cumulative_default", pattern="^stanfit_cumulative_[0-9]+\\.rda$",
                     full.names=TRUE)
 years <- as.integer(sub("^stanfit_cumulative_([0-9]+)\\.rda$", "\\1", basename(files)))
 files <- files[order(years)]
@@ -62,10 +62,10 @@ common <- list(
 )
 
 g1 <- ggplot(fitdata) +
-  geom_ribbon(aes(year+week/52, ymin=lwr, ymax=upr, fill=group), alpha=0.15) +
-  geom_line(aes(year+week/52, est, col=group)) +
   geom_point(data=filter(data_filter, missing==0),
              aes(year+week/52, smpx), size=0.3) +
+  geom_ribbon(aes(year+week/52, ymin=lwr, ymax=upr, fill=group), alpha=0.15) +
+  geom_line(aes(year+week/52, est, col=group)) +
   scale_x_continuous("Year", expand=c(0, 0)) +
   scale_y_continuous("Weekly deaths", expand=expansion(mult=c(0, 0.05))) +
   common +
@@ -73,16 +73,46 @@ g1 <- ggplot(fitdata) +
          fill=guide_legend(nrow=2, byrow=TRUE)) +
   theme(legend.position="top")
 
-g2 <- ggplot(betadata) +
+data_comp <- fitdata %>%
+  merge(data_filter)
+
+data_Rsq <- data_comp %>%
+  group_by(group) %>%
+  summarize(
+    Rsq=round(cor(log(est+1), log(smpx+1))^2, 3)
+  ) %>%
+  mutate(
+    text=paste0("R^2==", Rsq)
+  )
+
+g2 <- ggplot(data_comp) +
+  geom_point(aes(est+1, smpx+1, col=group), alpha=0.2, shape=21) +
+  geom_abline(intercept=0, slope=1, lty=2) +
+  geom_smooth(aes(est+1, smpx+1, col=group, fill=group), method="lm", fullrange=TRUE) +
+  geom_text(data=data_Rsq, aes(4, 100, label=text), parse=TRUE, family="Times") +
+  scale_x_log10("Predicted deaths", expand=c(0,0)) +
+  scale_y_log10("Observed deaths", expand=c(0,0)) +
+  common +
+  facet_wrap(~group, nrow=1) +
+  theme(
+    axis.title.x = element_text(),
+    strip.background = element_blank()
+  )
+
+g3 <- ggplot(betadata) +
   geom_ribbon(aes(week, ymin=lwr, ymax=upr, fill=group), alpha=0.15) +
   geom_line(aes(week, est, col=group)) +
   scale_x_continuous("Week of year", expand=c(0, 0),
-                     breaks=c(1, 11, 21, 31, 41, 51),
-                     labels=c("Wk 1", "Wk 11", "Wk 21", "Wk 31", "Wk 41", "Wk 51")) +
+                     breaks=c(1,  21, 41),
+                     labels=c("Wk 1", "Wk 21", "Wk 41")) +
   scale_y_continuous("Transmission rate\n(1/week)") +
-  common
+  facet_wrap(~group, nrow=1) +
+  common +
+  theme(
+    strip.background = element_blank()
+  )
 
-g3 <- ggplot(epsilondata) +
+g4 <- ggplot(epsilondata) +
   geom_ribbon(aes(year, ymin=lwr, ymax=upr, fill=group), alpha=0.15) +
   geom_line(aes(year, est, col=group)) +
   geom_hline(yintercept=1, lty=2) +
@@ -91,14 +121,6 @@ g3 <- ggplot(epsilondata) +
                 breaks=c(0.5, 1, 2, 4), labels=c("1/2", "1", "2", "4")) +
   common
 
-g4 <- ggplot(Sdata) +
-  geom_ribbon(aes(year+week/52, ymin=lwr, ymax=upr, fill=group), alpha=0.15) +
-  geom_line(aes(year+week/52, est, col=group)) +
-  scale_x_continuous("Year", expand=c(0, 0)) +
-  scale_y_continuous("Susceptible population",
-                     labels=function(x) format(x, big.mark=",", scientific=FALSE, trim=TRUE)) +
-  common +
-  theme(axis.title.x=element_text())
-
 gcomb <- ggarrange(g1, g2, g3, g4, ncol=1, labels=c("A", "B", "C", "D"))
-ggsave("figure_cumulative.pdf", gcomb, width=8, height=9)
+
+ggsave("figure_cumulative_default.pdf", gcomb, width=8, height=6)

@@ -5,7 +5,7 @@ source("../script/script_data.R")
 data_filter <- data_final %>%
   filter(year < 1796)
 
-model <- cmdstan_model("../stanmodel/sir_default.stan")
+model <- cmdstan_model("../stanmodel/sir_brw_erw.stan")
 
 standata <- list(
   N=nrow(data_filter),
@@ -50,29 +50,29 @@ reslist <- parallel::mclapply(1:nfit, run_one, mc.cores=ncores, mc.preschedule=F
 reslist <- Filter(Negate(is.null), reslist)
 if (!length(reslist)) stop("All optimization attempts failed")
 
-stanfit_sir_default_optim <- reslist %>%
+stanfit_sir_brw_erw_optim <- reslist %>%
   bind_rows
 
-plot(stanfit_sir_default_optim$value)
+plot(stanfit_sir_brw_erw_optim$value)
 
 oo_final <- model$optimize(data=standata,
-                           seed=stanfit_sir_default_optim$seed[which.max(stanfit_sir_default_optim$value)],
+                           seed=stanfit_sir_brw_erw_optim$seed[which.max(stanfit_sir_brw_erw_optim$value)],
                            jacobian = TRUE,
                            show_messages = FALSE) 
 
-stanfit_sir_default_laplace <- 
+stanfit_sir_brw_erw_laplace <- 
   model$laplace(data = standata, mode = oo_final)
 
 t1 <- Sys.time()
 t1 - t0
 
-summary_sir_default_laplace <- 
-  stanfit_sir_default_laplace$summary()
+summary_sir_brw_erw_laplace <- 
+  stanfit_sir_brw_erw_laplace$summary()
 
-save("stanfit_sir_default_optim", 
-     "stanfit_sir_default_laplace",
-     "summary_sir_default_laplace",
-     file="stanfit_sir_default.rda")
+save("stanfit_sir_brw_erw_optim", 
+     "stanfit_sir_brw_erw_laplace",
+     "summary_sir_brw_erw_laplace",
+     file="stanfit_sir_brw_erw.rda")
 
 dd <- oo_final$draws()
 

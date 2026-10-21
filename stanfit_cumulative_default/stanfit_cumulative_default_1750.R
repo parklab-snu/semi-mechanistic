@@ -5,7 +5,7 @@ source("../script/script_data.R")
 data_filter <- data_final %>%
   filter(year < 1750)
 
-model <- cmdstan_model("../stanmodel/sir_perturb_demog_dd-v2.stan")
+model <- cmdstan_model("../stanmodel/sir_default.stan")
 
 standata <- list(
   N=nrow(data_filter),
@@ -21,36 +21,42 @@ standata <- list(
 )
 
 nfit <- 100
+ncores <- 8
 
 t0 <- Sys.time()
-reslist <- vector('list', nfit)
-for (i in 1:nfit) {
-  print(i)
-  
-  oo <- model$optimize(data=standata,
-                       seed=i,
-                       jacobian = TRUE,
-                       show_messages = FALSE,
-                       show_exceptions = FALSE,
-                       iter=1e4)
-  
-  lp <- try(oo$lp())
-  
-  if (!inherits(lp, "try-error")) {
-    reslist[[i]] <- data.frame(
-      seed=i,
-      value=oo$lp()
-    )
+run_one <- function(i) {
+  oo <- try(model$optimize(data=standata,
+                           seed=i,
+                           jacobian = TRUE,
+                           refresh=0,
+                           show_messages = FALSE,
+                           show_exceptions = FALSE,
+                           iter=1e4), silent=TRUE)
+  if (inherits(oo, "try-error")) {
+    warning(paste("Optimization failed for seed", i))
+    return(NULL)
   }
+  
+  lp <- try(oo$lp(), silent=TRUE)
+  if (inherits(lp, "try-error") || length(lp)!=1 || !is.finite(lp)) {
+    warning(paste("No finite log density for seed", i))
+    return(NULL)
+  }
+  
+  data.frame(seed=i, value=lp)
 }
+
+reslist <- parallel::mclapply(1:nfit, run_one, mc.cores=ncores, mc.preschedule=FALSE)
+reslist <- Filter(Negate(is.null), reslist)
+if (!length(reslist)) stop("All optimization attempts failed")
 
 stanfit_cumulative_1750_optim <- reslist %>%
   bind_rows
 
-ww <- which(rank(-stanfit_cumulative_1750_optim$value)==min(rank(-stanfit_cumulative_1750_optim$value)))
+plot(stanfit_cumulative_1750_optim$value)
 
 oo_final <- model$optimize(data=standata,
-                           seed=stanfit_cumulative_1750_optim$seed[ww[2]],
+                           seed=stanfit_cumulative_1750_optim$seed[which.max(stanfit_cumulative_1750_optim$value)],
                            jacobian = TRUE,
                            show_messages = FALSE) 
 
@@ -77,7 +83,7 @@ plot(exp(dd[grepl("^epsilon\\[", colnames(dd))]), type="l")
 
 dd[grepl("sigma_epsilon", colnames(dd))]
 
-plot((dd[grepl("beta\\[", colnames(dd))])*3, type="l")    
+plot((dd[grepl("beta\\[", colnames(dd))]), type="l")    
 
 plot(dd[grepl("beta_eff\\[", colnames(dd))], type="l")    
 plot(dd[grepl("S\\[", colnames(dd))]/data_filter$population, type="l")    
