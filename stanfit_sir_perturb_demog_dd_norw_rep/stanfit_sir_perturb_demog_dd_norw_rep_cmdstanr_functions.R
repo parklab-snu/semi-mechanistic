@@ -86,7 +86,7 @@ fit_sir_perturb_demog_dd_norw_rep <- function(rep_id,
                                          ncores = sir_norw_default_ncores(),
                                          iter = 1e4,
                                          data_file = "../simulate/simulate_rep.rda",
-                                         stan_file = "../stanmodel/sir_perturb_demog_dd_norw.stan",
+                                         stan_file = "../stanmodel/sir_perturb_demog_dd_norw_wide.stan",
                                          output_dir = ".") {
   rep_id <- as.integer(rep_id)
   if (length(rep_id) != 1L || is.na(rep_id) || rep_id < 1L) {

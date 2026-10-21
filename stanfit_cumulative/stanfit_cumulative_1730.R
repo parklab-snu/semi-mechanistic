@@ -5,7 +5,7 @@ source("../script/script_data.R")
 data_filter <- data_final %>%
   filter(year < 1730)
 
-model <- cmdstan_model("../stanmodel/sir_perturb_demog_dd-v2.stan")
+model <- cmdstan_model("../stanmodel/sir_perturb_demog_dd_norw_wide-v2.stan")
 
 standata <- list(
   N=nrow(data_filter),

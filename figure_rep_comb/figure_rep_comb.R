@@ -130,7 +130,7 @@ g4 <- ggplot(coverdata) +
   geom_hline(yintercept=0, lty=2) +
   geom_hline(data=covermean, aes(yintercept=bias, col=group), lty=3) +
   scale_x_continuous("Year", expand=c(0, 0)) +
-  scale_y_continuous("Relative bias", limits=c(-0.43, 0.04), expand=c(0, 0)) +
+  scale_y_continuous("Relative bias", limits=c(-0.1, 0.3), expand=c(0, 0)) +
   common
 
 g5 <- ggplot(coverdata) +

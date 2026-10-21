@@ -1,2 +1,3 @@
 source("stanfit_sir_perturb_demog_dd_rep_half_cmdstanr_functions.R")
-fit_sir_perturb_demog_dd_rep_half(rep_id = 8L, ncores=8)
+fit_sir_perturb_demog_dd_rep_half(rep_id = 8L, ncores=8,
+                                  nfit = 76) # seed 77 gets stuck so I'm truncating here...

@@ -87,7 +87,7 @@ fit_sir_perturb_demog_dd_rep_nc <- function(
     ncores = sir_default_ncores(),
     iter = 1e4,
     data_file = "../simulate/simulate_rep_nochange.rda",
-    stan_file = "../stanmodel/sir_perturb_demog_dd.stan",
+    stan_file = "../stanmodel/sir_perturb_demog_dd_wide.stan",
     output_dir = ".") {
   rep_id <- as.integer(rep_id)
   if (length(rep_id) != 1L || is.na(rep_id) || rep_id < 1L) {

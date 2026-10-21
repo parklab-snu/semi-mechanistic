@@ -17,7 +17,7 @@ parameters {
   real<lower=0, upper=1> rho;
   array[52] real logbeta;
   real<lower=0> sigma;
-  array[Nyear] real z_epsilon;
+  array[Nyear-1] real z_epsilon;
   real<lower=0> sigma_epsilon;
   real<lower=0> phi;
   real<lower=0> omega;
@@ -30,9 +30,9 @@ transformed parameters {
   vector<lower=0>[N] beta_eff;
   
   vector[Nyear] epsilon;
-  epsilon[1] = sigma_epsilon * z_epsilon[1];
+  epsilon[1] = 0;
   for (i in 2:Nyear) {
-    epsilon[i] = sigma_epsilon * z_epsilon[i];
+    epsilon[i] = sigma_epsilon * z_epsilon[i-1];
   }
   
   S[1] = S0 * pop[1];
