@@ -4,12 +4,14 @@ library(egg)
 source("../R/colors.R")
 
 scenarios <- data.frame(
-  scenario=c("Full change", "Half change", "No change"),
-  suffix=c("", "_half", "_nc"),
-  simulation=c("simulate_rep", "simulate_rep_half", "simulate_rep_nochange")
+  scenario=c("Full change", "No change"),
+  suffix=c("", "_nc"),
+  simulation=c("simulate_rep", "simulate_rep_nochange")
 )
 
-groups <- c("Random walk priors", "Independent priors")
+models <- c("Random walk priors"="sir_brw_erw",
+            "Independent priors"="sir_default")
+groups <- names(models)
 cols <- setNames(colors_default[c(1,3)], sort(groups))
 
 get_summary <- function(dd, variable, time, true, trans=identity) {
@@ -24,20 +26,21 @@ get_summary <- function(dd, variable, time, true, trans=identity) {
 read_scenario <- function(suffix, simulation, scenario) {
   env <- new.env()
   load(paste0("../simulate/", simulation, ".rda"), envir=env)
-  sim <- env[[simulation]][[1]]
-  year <- sim[[1]]$year+1669
-  week <- sim[[1]]$week
+  simulations <- env[[simulation]]
 
   lapply(seq_along(groups), function(j) {
-    model <- paste0("sir_perturb_demog_dd", c("", "_norw")[j])
-    lapply(1:10, function(i) {
+    model <- models[[j]]
+    lapply(seq_along(simulations), function(i) {
       message(scenario, ": ", groups[j], ", replicate ", i)
-      # Keep only extracted summaries, rather than retaining all 60 fit objects.
+      sim <- simulations[[i]]
+      year <- sim[[1]]$year+1669
+      week <- sim[[1]]$week
+      # Keep only extracted summaries, rather than retaining all fit objects.
       env <- new.env()
       load(paste0("../stanfit_", model, "_rep", suffix,
-                  "/stanfit_", model, "_cmdstanr_rep", suffix, i, ".rda"),
+                  "/stanfit_", model, "_rep", suffix, i, ".rda"),
            envir=env)
-      dd <- env[[paste0("summary_", model, "_cmdstanr_laplace_rep", suffix, i)]]
+      dd <- env[[paste0("summary_", model, "_laplace_rep", suffix, i)]]
       stopifnot(!is.null(dd))
 
       bind_rows(
@@ -82,9 +85,9 @@ covermean <- coverdata %>%
   group_by(scenario, group) %>%
   summarize(bias=mean(bias), coverage=mean(coverage), .groups="drop")
 
-# Each plot is one row, with the three scenarios as fixed-scale facets.
+# Each plot is one row, with the two scenarios as columns.
 common <- list(
-  facet_wrap(~scenario, nrow=1, scale="free_y"),
+  facet_wrap(~scenario, nrow=1, scales="free_y"),
   scale_color_manual("", values=cols),
   theme(
     panel.grid=element_blank(),
@@ -109,20 +112,22 @@ g1 <- plot_fit("beta") +
   scale_x_continuous("Week of year", expand=c(0, 0),
                      breaks=c(1, 11, 21, 31, 41, 51),
                      labels=c("Wk 1", "Wk 11", "Wk 21", "Wk 31", "Wk 41", "Wk 51")) +
-  scale_y_continuous("Transmission rate\n(1/week)", limits=c(1.55, 2)) +
+  scale_y_continuous("Seasonal\ntransmission rate\n(1/week)",
+                     limits=c(1.2, 2.1)) +
   theme(strip.text=element_text(), legend.position="top")
 
 g2 <- plot_fit("epsilon") +
   geom_hline(yintercept=1, lty=2) +
   scale_x_continuous("Year", expand=c(0, 0)) +
   scale_y_log10("Multiplicative\nchanges in\ntransmission",
-                breaks=c(0.5, 1, 2, 4), limits=c(0.45, 4.5), expand=c(0, 0),
-                labels=c("1/2", "1", "2", "4")) 
+                breaks=c(0.5, 1, 2, 4),
+                labels=c("1/2", "1", "2", "4"), limits=c(0.5, 4)) 
 
 g3 <- plot_fit("beff") +
   scale_x_continuous("Year", expand=c(0, 0)) +
-  scale_y_log10("Transmission rate", 
-                breaks=c(1, 2, 4, 8), limits=c(1, 8))
+  scale_y_log10("Transmission rate\n(1/week)", 
+                breaks=c(1, 2, 4, 8),
+                limits=c(0.8, 10))
 
 g4 <- ggplot(coverdata) +
   geom_point(aes(year, bias, col=group), size=0.5) +
@@ -130,7 +135,7 @@ g4 <- ggplot(coverdata) +
   geom_hline(yintercept=0, lty=2) +
   geom_hline(data=covermean, aes(yintercept=bias, col=group), lty=3) +
   scale_x_continuous("Year", expand=c(0, 0)) +
-  scale_y_continuous("Relative bias", limits=c(-0.1, 0.3), expand=c(0, 0)) +
+  scale_y_continuous("Relative bias", limits=c(-0.18, 0.35)) +
   common
 
 g5 <- ggplot(coverdata) +

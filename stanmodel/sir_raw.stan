@@ -16,7 +16,6 @@ parameters {
   real<lower=0, upper=1> I0;
   real<lower=0, upper=1> rho;
   array[52] real logbeta;
-  real<lower=0> sigma;
   real<lower=0> phi;
   real<lower=0> omega;
 }
@@ -48,13 +47,7 @@ transformed parameters {
 }
 
 model {
-  logbeta ~ normal(0.5, 0.1);
-  for (i in 2:52) {
-    logbeta[i] ~ normal(logbeta[i-1], sigma);
-  }
-  logbeta[1] ~ normal(logbeta[52], sigma);
-  
-  sigma ~ normal(0, 0.01);
+  logbeta ~ normal(0.5, 0.2);
   
   S0 ~ beta(1, 1);
   I0 ~ normal(0, 0.001);
