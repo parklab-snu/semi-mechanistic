@@ -16,7 +16,6 @@ parameters {
   real<lower=0, upper=1> I0;
   real<lower=0, upper=1> rho;
   array[52] real logbeta;
-  real<lower=0> sigma;
   array[Nyear-1] real z_epsilon;
   real<lower=0> sigma_epsilon;
   real<lower=0> phi;
@@ -32,7 +31,7 @@ transformed parameters {
   vector[Nyear] epsilon;
   epsilon[1] = 0;
   for (i in 2:Nyear) {
-    epsilon[i] = epsilon[i-1] + sigma_epsilon * z_epsilon[i-1];
+    epsilon[i] = sigma_epsilon * z_epsilon[i-1];
   }
   
   S[1] = S0 * pop[1];
@@ -56,16 +55,10 @@ transformed parameters {
 }
 
 model {
-  logbeta ~ normal(0.5, 0.1);
-  for (i in 2:52) {
-    logbeta[i] ~ normal(logbeta[i-1], sigma);
-  }
-  logbeta[1] ~ normal(logbeta[52], sigma);
-  
-  sigma ~ normal(0, 0.01);
+  logbeta ~ normal(0.5, 0.2);
   
   z_epsilon ~ normal(0, 1);
-  sigma_epsilon ~ normal(0, 0.01);
+  sigma_epsilon ~ normal(0, 0.5);
   
   S0 ~ beta(1, 1);
   I0 ~ normal(0, 0.001);

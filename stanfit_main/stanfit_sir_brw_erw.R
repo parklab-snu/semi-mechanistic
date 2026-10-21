@@ -5,7 +5,7 @@ source("../script/script_data.R")
 data_filter <- data_final %>%
   filter(year < 1796)
 
-model <- cmdstan_model("../stanmodel/sir_perturb_demog_dd_norw_wide.stan")
+model <- cmdstan_model("../stanmodel/sir_default.stan")
 
 standata <- list(
   N=nrow(data_filter),
@@ -25,7 +25,6 @@ ncores <- 8
 
 t0 <- Sys.time()
 run_one <- function(i) {
-  print(i)
   oo <- try(model$optimize(data=standata,
                            seed=i,
                            jacobian = TRUE,
@@ -51,43 +50,44 @@ reslist <- parallel::mclapply(1:nfit, run_one, mc.cores=ncores, mc.preschedule=F
 reslist <- Filter(Negate(is.null), reslist)
 if (!length(reslist)) stop("All optimization attempts failed")
 
-stanfit_sir_perturb_demog_dd_norw_wide_cmdstanr_optim <- reslist %>%
+stanfit_sir_default_optim <- reslist %>%
   bind_rows
 
-plot(stanfit_sir_perturb_demog_dd_norw_wide_cmdstanr_optim$value)
+plot(stanfit_sir_default_optim$value)
 
 oo_final <- model$optimize(data=standata,
-                           seed=stanfit_sir_perturb_demog_dd_norw_wide_cmdstanr_optim$seed[which.max(stanfit_sir_perturb_demog_dd_norw_wide_cmdstanr_optim$value)],
+                           seed=stanfit_sir_default_optim$seed[which.max(stanfit_sir_default_optim$value)],
                            jacobian = TRUE,
                            show_messages = FALSE) 
 
-stanfit_sir_perturb_demog_dd_norw_wide_cmdstanr_laplace <- 
+stanfit_sir_default_laplace <- 
   model$laplace(data = standata, mode = oo_final)
 
 t1 <- Sys.time()
 t1 - t0
 
-summary_sir_perturb_demog_dd_norw_wide_cmdstanr_laplace <- 
-  stanfit_sir_perturb_demog_dd_norw_wide_cmdstanr_laplace$summary()
+summary_sir_default_laplace <- 
+  stanfit_sir_default_laplace$summary()
 
-save("stanfit_sir_perturb_demog_dd_norw_wide_cmdstanr_optim", 
-     "stanfit_sir_perturb_demog_dd_norw_wide_cmdstanr_laplace",
-     "summary_sir_perturb_demog_dd_norw_wide_cmdstanr_laplace",
-     file="stanfit_sir_perturb_demog_dd_norw_wide_cmdstanr.rda")
+save("stanfit_sir_default_optim", 
+     "stanfit_sir_default_laplace",
+     "summary_sir_default_laplace",
+     file="stanfit_sir_default.rda")
 
-dd_norw_wide <- oo_final$draws()
+dd <- oo_final$draws()
 
 plot(data_filter$smpx)
-lines(dd_norw_wide[grepl("C\\[", colnames(dd_norw_wide))], col=2)
+lines(dd[grepl("C\\[", colnames(dd))], col=2)
 
-plot(exp(dd_norw_wide[grepl("^epsilon\\[", colnames(dd_norw_wide))]), type="l")    
+plot(exp(dd[grepl("^epsilon\\[", colnames(dd))]), type="l")    
 
-dd_norw_wide[grepl("sigma_epsilon", colnames(dd_norw_wide))]
+dd[grepl("sigma", colnames(dd))]
+dd[grepl("sigma_epsilon", colnames(dd))]
 
-plot((dd_norw_wide[grepl("beta\\[", colnames(dd_norw_wide))])*3, type="l")    
+plot((dd[grepl("logbeta\\[", colnames(dd))]), type="l")    
 
-plot(dd_norw_wide[grepl("beta_eff\\[", colnames(dd_norw_wide))], type="l")    
-plot(dd_norw_wide[grepl("S\\[", colnames(dd_norw_wide))]/data_filter$population, type="l")    
+plot(dd[grepl("beta_eff\\[", colnames(dd))], type="l")    
+plot(dd[grepl("S\\[", colnames(dd))]/data_filter$population, type="l")    
 
-dd_norw_wide[grepl("phi", colnames(dd_norw_wide))]
-dd_norw_wide[grepl("rho", colnames(dd_norw_wide))]
+dd[grepl("phi", colnames(dd))]
+dd[grepl("rho", colnames(dd))]

@@ -5,7 +5,7 @@ source("../script/script_data.R")
 data_filter <- data_final %>%
   filter(year < 1796)
 
-model <- cmdstan_model("../stanmodel/sir_perturb_demog_dd_wide.stan")
+model <- cmdstan_model("../stanmodel/sir_erw.stan")
 
 standata <- list(
   N=nrow(data_filter),
@@ -20,7 +20,7 @@ standata <- list(
   gamma=-log(1-1/3)
 )
 
-nfit <- 200
+nfit <- 100
 ncores <- 8
 
 t0 <- Sys.time()
@@ -50,31 +50,29 @@ reslist <- parallel::mclapply(1:nfit, run_one, mc.cores=ncores, mc.preschedule=F
 reslist <- Filter(Negate(is.null), reslist)
 if (!length(reslist)) stop("All optimization attempts failed")
 
-stanfit_sir_perturb_demog_dd_wide_cmdstanr_optim <- reslist %>%
+stanfit_sir_erw_optim <- reslist %>%
   bind_rows
 
-stanfit_sir_perturb_demog_dd_wide_cmdstanr_optim <- stanfit_sir_perturb_demog_dd_wide_cmdstanr_optim[-3,]
-
-plot(stanfit_sir_perturb_demog_dd_wide_cmdstanr_optim$value)
+plot(stanfit_sir_erw_optim$value)
 
 oo_final <- model$optimize(data=standata,
-                           seed=stanfit_sir_perturb_demog_dd_wide_cmdstanr_optim$seed[which.max(stanfit_sir_perturb_demog_dd_wide_cmdstanr_optim$value)],
+                           seed=stanfit_sir_erw_optim$seed[which.max(stanfit_sir_erw_optim$value)],
                            jacobian = TRUE,
                            show_messages = FALSE) 
 
-stanfit_sir_perturb_demog_dd_wide_cmdstanr_laplace <- 
+stanfit_sir_erw_laplace <- 
   model$laplace(data = standata, mode = oo_final)
 
 t1 <- Sys.time()
 t1 - t0
 
-summary_sir_perturb_demog_dd_wide_cmdstanr_laplace <- 
-  stanfit_sir_perturb_demog_dd_wide_cmdstanr_laplace$summary()
+summary_sir_erw_laplace <- 
+  stanfit_sir_erw_laplace$summary()
 
-save("stanfit_sir_perturb_demog_dd_wide_cmdstanr_optim", 
-     "stanfit_sir_perturb_demog_dd_wide_cmdstanr_laplace",
-     "summary_sir_perturb_demog_dd_wide_cmdstanr_laplace",
-     file="stanfit_sir_perturb_demog_dd_wide_cmdstanr.rda")
+save("stanfit_sir_erw_optim", 
+     "stanfit_sir_erw_laplace",
+     "summary_sir_erw_laplace",
+     file="stanfit_sir_erw.rda")
 
 dd <- oo_final$draws()
 
@@ -86,7 +84,7 @@ plot(exp(dd[grepl("^epsilon\\[", colnames(dd))]), type="l")
 dd[grepl("sigma", colnames(dd))]
 dd[grepl("sigma_epsilon", colnames(dd))]
 
-plot(exp(dd[grepl("beta\\[", colnames(dd))])*3, type="l")    
+plot((dd[grepl("logbeta\\[", colnames(dd))]), type="l")    
 
 plot(dd[grepl("beta_eff\\[", colnames(dd))], type="l")    
 plot(dd[grepl("S\\[", colnames(dd))]/data_filter$population, type="l")    
