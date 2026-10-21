@@ -20,7 +20,7 @@ standata <- list(
   gamma=-log(1-1/3)
 )
 
-nfit <- 100
+nfit <- 400
 ncores <- 8
 
 t0 <- Sys.time()
@@ -53,7 +53,7 @@ if (!length(reslist)) stop("All optimization attempts failed")
 stanfit_sir_raw_optim <- reslist %>%
   bind_rows
 
-plot(stanfit_sir_raw_optim$value)
+plot(stanfit_sir_raw_optim$value, ylim=c(-28252, -28250))
 
 oo_final <- model$optimize(data=standata,
                            seed=stanfit_sir_raw_optim$seed[which.max(stanfit_sir_raw_optim$value)],
@@ -78,8 +78,6 @@ dd <- oo_final$draws()
 
 plot(data_filter$smpx)
 lines(dd[grepl("C\\[", colnames(dd))], col=2)
-
-plot(exp(dd[grepl("^epsilon\\[", colnames(dd))]), type="l")    
 
 dd[grepl("sigma", colnames(dd))]
 dd[grepl("sigma_epsilon", colnames(dd))]

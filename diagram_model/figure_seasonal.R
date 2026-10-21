@@ -5,16 +5,16 @@ library(egg)
 library(cmdstanr)
 source("../script/script_data.R")
 
-load("../stanfit_sir_perturb_demog_dd/stanfit_sir_perturb_demog_dd_cmdstanr.rda")
+load("../stanfit_main/stanfit_sir_brw_erw.rda")
 
 data_filter <- data_final %>%
   filter(year < 1796)
 
 betadata <- data.frame(
   week=1:52,
-  est=exp(summary_sir_perturb_demog_dd_cmdstanr_laplace$median[grepl("logbeta\\[", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)]),
-  lwr=exp(summary_sir_perturb_demog_dd_cmdstanr_laplace$q5[grepl("logbeta\\[", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)]),
-  upr=exp(summary_sir_perturb_demog_dd_cmdstanr_laplace$q95[grepl("logbeta\\[", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)])
+  est=exp(summary_sir_brw_erw_laplace$median[grepl("logbeta\\[", summary_sir_brw_erw_laplace$variable)]),
+  lwr=exp(summary_sir_brw_erw_laplace$q5[grepl("logbeta\\[", summary_sir_brw_erw_laplace$variable)]),
+  upr=exp(summary_sir_brw_erw_laplace$q95[grepl("logbeta\\[", summary_sir_brw_erw_laplace$variable)])
 )
 
 g1 <- ggplot(betadata) +
@@ -31,9 +31,9 @@ g1 <- ggplot(betadata) +
 
 epsilondata <- data.frame(
   year=unique(data_filter$year),
-  est=summary_sir_perturb_demog_dd_cmdstanr_laplace$median[grepl("^epsilon\\[", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)],
-  lwr=summary_sir_perturb_demog_dd_cmdstanr_laplace$q5[grepl("^epsilon\\[", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)],
-  upr=summary_sir_perturb_demog_dd_cmdstanr_laplace$q95[grepl("^epsilon\\[", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)]
+  est=summary_sir_brw_erw_laplace$median[grepl("^epsilon\\[", summary_sir_brw_erw_laplace$variable)],
+  lwr=summary_sir_brw_erw_laplace$q5[grepl("^epsilon\\[", summary_sir_brw_erw_laplace$variable)],
+  upr=summary_sir_brw_erw_laplace$q95[grepl("^epsilon\\[", summary_sir_brw_erw_laplace$variable)]
 )
 
 g2 <- ggplot(epsilondata) +
