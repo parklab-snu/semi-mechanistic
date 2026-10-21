@@ -113,7 +113,7 @@ g1 <- plot_fit("beta") +
                      breaks=c(1, 11, 21, 31, 41, 51),
                      labels=c("Wk 1", "Wk 11", "Wk 21", "Wk 31", "Wk 41", "Wk 51")) +
   scale_y_continuous("Seasonal\ntransmission rate\n(1/week)",
-                     limits=c(1.2, 2.1)) +
+                     limits=c(1.17, 2.35), expand=c(0, 0)) +
   theme(strip.text=element_text(), legend.position="top")
 
 g2 <- plot_fit("epsilon") +
