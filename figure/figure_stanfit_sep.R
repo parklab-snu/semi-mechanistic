@@ -14,9 +14,8 @@ data_filter <- data_final %>%
 
 year <- data_filter$year-min(data_filter$year)+1
 
-group <- floor(year/20)
-group[group==6] <- 5
-group <- group + 1
+group <- ceiling(year/20)
+group[group==7] <- 6
 
 all_summ <- list(
   Separate=summary_sir_default_sep_laplace,
@@ -40,8 +39,9 @@ fitdata <- lapply(all_summ, function(x) {
 colors_this <- c(colors_default[1], colors_new[1])
 
 g1 <- ggplot(fitdata) +
+  geom_vline(xintercept=c(1690, 1710, 1730, 1750, 1770), lty=3) +
   geom_point(data=data_filter, aes(year+week/52, smpx), size=0.3) +
-  geom_ribbon(aes(year+week/52, ymin=lwr, ymax=upr, fill=group), alpha=0.4) +
+  geom_ribbon(aes(year+week/52, ymin=lwr, ymax=upr, fill=group), alpha=0.3) +
   geom_line(aes(year+week/52, est, col=group)) +
   scale_x_continuous("Year", expand=c(0, 0)) +
   scale_y_continuous("Weekly deaths", expand=c(0, 0), limits=c(0, 260)) +
@@ -57,17 +57,28 @@ g1 <- ggplot(fitdata) +
   )
 
 data_comp <- fitdata %>%
-  merge(data_filter)
+  merge(data_filter) %>%
+  mutate(
+    group_y=factor(group_y,
+                   levels=1:6,
+                   labels=c("1670-1689",
+                            "1690-1709",
+                            "1710-1729",
+                            "1730-1749",
+                            "1750-1769",
+                            "1770-1796"))
+  )
 
 data_Rsq <- data_comp %>%
   group_by(group, group_y) %>%
   summarize(
-    Rsq=round(cor(log(est+1), log(smpx+1))^2, 3)
+    Rsq=signif(cor(log(est+1), log(smpx+1))^2, 3)
   ) %>%
   ungroup %>%
   mutate(
     text=paste0("R^2==", Rsq),
-    y=-30+120*as.numeric(as.factor(group))
+    y=-30+120*as.numeric(as.factor(group)),
+    text=ifelse(text=="R^2==0.77", "R^2==0.770", text)
   )
 
 g2 <- ggplot(data_comp) +
@@ -109,23 +120,29 @@ betadata <- lapply(all_summ, function(x) {
                           "1730-1749",
                           "1750-1769",
                           "1770-1796"))
+  ) %>%
+  group_by(group, group_y) %>%
+  arrange(group, group_y, week) %>%
+  mutate(
+    est_roll=zoo::rollapply(est, 7, "mean", partial=TRUE)
   )
 
 g3 <- ggplot(betadata) +
-  geom_point(aes(week, est, col=group), size=0.5) +
-  geom_smooth(aes(week, est, col=group), method="gam", formula = y~ s(x, bs="cc"),
-              se=FALSE) +
+  geom_errorbar(aes(week, ymin=lwr, ymax=upr, col=group), width=0, linewidth=0.2,
+                position = position_dodge(width=1), alpha=0.5) +
+  geom_point(aes(week, est, col=group), size=0.5,
+             position = position_dodge(width=1)) +
+  geom_line(aes(week, est_roll, col=group), lwd=1) +
   scale_x_continuous("Week of year", expand=c(0, 0),
-                     breaks=c(1, 21, 41),
-                     labels=c("Wk 1", "Wk 21",  "Wk 41")) +
-  scale_y_continuous("Smoothed\ntransmission rate\n(1/week)") +
+                     breaks=c(1,11, 21, 31, 41, 51)) +
+  scale_y_continuous("Smoothed\ntransmission rate\n(1/week)", expand=c(0, 0)) +
+  coord_cartesian(ylim=c(1, 2.5)) +
   scale_color_manual("Prior distribution", values=colors_this) +
   scale_fill_manual("Prior distribution", values=colors_this) +
   facet_wrap(~group_y, nrow=1) +
   theme(
     panel.grid = element_blank(),
     panel.border = element_rect(linewidth=1),
-    axis.title.x = element_blank(),
     legend.position = "none",
     strip.background = element_blank()
   )
@@ -143,7 +160,7 @@ epsilondata <- lapply(all_summ, function(x) {
   )
 
 g4 <- ggplot(epsilondata) +
-  geom_ribbon(aes(year, ymin=lwr, ymax=upr, fill=group), alpha=0.4) +
+  geom_ribbon(aes(year, ymin=lwr, ymax=upr, fill=group), alpha=0.3) +
   geom_line(aes(year, est, col=group)) +
   scale_x_continuous("Year", expand=c(0, 0)) +
   scale_y_log10("Multiplicative\nchanges in\ntransmission",

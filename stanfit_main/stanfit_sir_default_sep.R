@@ -9,8 +9,8 @@ model <- cmdstan_model("../stanmodel/sir_default_sep.stan")
 
 year <- data_filter$year-min(data_filter$year)+1
 
-group <- floor(year/20)
-group[group==6] <- 5
+group <- ceiling(year/20)
+group[group==7] <- 6
 
 standata <- list(
   N=nrow(data_filter),
@@ -24,7 +24,7 @@ standata <- list(
   pop=data_filter$population,
   gamma=-log(1-1/3),
   Ngroup=6,
-  group=group+1
+  group=group
 )
 
 nfit <- 100
