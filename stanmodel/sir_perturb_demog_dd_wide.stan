@@ -65,7 +65,7 @@ model {
   sigma ~ normal(0, 0.01);
   
   z_epsilon ~ normal(0, 1);
-  sigma_epsilon ~ normal(0, 0.1);
+  sigma_epsilon ~ normal(0, 0.5);
   
   S0 ~ beta(1, 1);
   I0 ~ normal(0, 0.001);
