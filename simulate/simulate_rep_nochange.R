@@ -3,7 +3,7 @@ library(cmdstanr)
 source("../script/script_data.R")
 source("../R/simulate.R")
 
-load("../stanfit_sir_perturb_demog_dd/stanfit_sir_perturb_demog_dd_cmdstanr.rda")
+load("../stanfit_main/stanfit_sir_brw_erw.rda")
 
 data_filter <- data_final %>%
   filter(year < 1796)
@@ -20,13 +20,13 @@ for (i in 1:nsim) {
                      drate=data_filter$death/data_filter$population,
                      pop=data_filter$population,
                      gamma=-log(1-1/3),
-                     S0=summary_sir_perturb_demog_dd_cmdstanr_laplace$median[grepl("S0", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)],
-                     I0=summary_sir_perturb_demog_dd_cmdstanr_laplace$median[grepl("I0", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)],
-                     rho=summary_sir_perturb_demog_dd_cmdstanr_laplace$median[grepl("rho", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)],
-                     logbeta=summary_sir_perturb_demog_dd_cmdstanr_laplace$median[grepl("logbeta\\[", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)],
+                     S0=summary_sir_brw_erw_laplace$median[grepl("S0", summary_sir_brw_erw_laplace$variable)],
+                     I0=summary_sir_brw_erw_laplace$median[grepl("I0", summary_sir_brw_erw_laplace$variable)],
+                     rho=summary_sir_brw_erw_laplace$median[grepl("rho", summary_sir_brw_erw_laplace$variable)],
+                     logbeta=summary_sir_brw_erw_laplace$median[grepl("logbeta\\[", summary_sir_brw_erw_laplace$variable)],
                      epsilon=rep(0, 126),
-                     omega=summary_sir_perturb_demog_dd_cmdstanr_laplace$median[grepl("omega", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)],
-                     phi=summary_sir_perturb_demog_dd_cmdstanr_laplace$median[grepl("phi", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)],
+                     omega=summary_sir_brw_erw_laplace$median[grepl("omega", summary_sir_brw_erw_laplace$variable)],
+                     phi=summary_sir_brw_erw_laplace$median[grepl("phi", summary_sir_brw_erw_laplace$variable)],
                      tmax=nrow(data_filter),
                      seed=i)
   
@@ -41,13 +41,13 @@ for (i in 1:nsim) {
       I=ss$I,
       cases=ss$cases
     ),
-    S0=summary_sir_perturb_demog_dd_cmdstanr_laplace$median[grepl("S0", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)],
-    I0=summary_sir_perturb_demog_dd_cmdstanr_laplace$median[grepl("I0", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)],
-    rho=summary_sir_perturb_demog_dd_cmdstanr_laplace$median[grepl("rho", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)],
-    logbeta=summary_sir_perturb_demog_dd_cmdstanr_laplace$median[grepl("logbeta\\[", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)],
+    S0=summary_sir_brw_erw_laplace$median[grepl("S0", summary_sir_brw_erw_laplace$variable)],
+    I0=summary_sir_brw_erw_laplace$median[grepl("I0", summary_sir_brw_erw_laplace$variable)],
+    rho=summary_sir_brw_erw_laplace$median[grepl("rho", summary_sir_brw_erw_laplace$variable)],
+    logbeta=summary_sir_brw_erw_laplace$median[grepl("logbeta\\[", summary_sir_brw_erw_laplace$variable)],
     epsilon=rep(0, 126),
-    omega=summary_sir_perturb_demog_dd_cmdstanr_laplace$median[grepl("omega", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)],
-    phi=summary_sir_perturb_demog_dd_cmdstanr_laplace$median[grepl("phi", summary_sir_perturb_demog_dd_cmdstanr_laplace$variable)]
+    omega=summary_sir_brw_erw_laplace$median[grepl("omega", summary_sir_brw_erw_laplace$variable)],
+    phi=summary_sir_brw_erw_laplace$median[grepl("phi", summary_sir_brw_erw_laplace$variable)]
   )
   
 }

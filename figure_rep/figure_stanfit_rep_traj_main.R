@@ -4,19 +4,19 @@ library(egg)
 library(cmdstanr)
 library(gridExtra)
 load("../simulate/simulate_rep.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep1.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep2.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep3.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep4.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep5.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep6.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep7.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep8.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep9.rda")
-load("../stanfit_sir_perturb_demog_dd_rep/stanfit_sir_perturb_demog_dd_cmdstanr_rep10.rda")
+load("../stanfit_sir_default_rep/stanfit_sir_default_rep1.rda")
+load("../stanfit_sir_default_rep/stanfit_sir_default_rep2.rda")
+load("../stanfit_sir_default_rep/stanfit_sir_default_rep3.rda")
+load("../stanfit_sir_default_rep/stanfit_sir_default_rep4.rda")
+load("../stanfit_sir_default_rep/stanfit_sir_default_rep5.rda")
+load("../stanfit_sir_default_rep/stanfit_sir_default_rep6.rda")
+load("../stanfit_sir_default_rep/stanfit_sir_default_rep7.rda")
+load("../stanfit_sir_default_rep/stanfit_sir_default_rep8.rda")
+load("../stanfit_sir_default_rep/stanfit_sir_default_rep9.rda")
+load("../stanfit_sir_default_rep/stanfit_sir_default_rep10.rda")
 
 fitdata <- lapply(1:10, function(x) {
-  dd <- get(paste0("summary_sir_perturb_demog_dd_cmdstanr_laplace_rep", x))
+  dd <- get(paste0("summary_sir_default_laplace_rep", x))
   
   ss <- simulate_rep[[x]]
   
@@ -70,5 +70,5 @@ g2 <- ggplot(fitdata) +
     strip.background = element_blank()
   )
 
-ggsave("figure_stanfit_rep_traj_1.pdf", g1, width=8, height=6)
-ggsave("figure_stanfit_rep_traj_2.pdf", g2, width=8, height=6)
+ggsave("figure_stanfit_rep_traj_main_1.pdf", g1, width=8, height=6)
+ggsave("figure_stanfit_rep_traj_main_2.pdf", g2, width=8, height=6)
