@@ -4,9 +4,9 @@ library(egg)
 source("../R/colors.R")
 
 scenarios <- data.frame(
-  scenario=c("No change"),
-  suffix=c("_nc_stoch"),
-  simulation=c("simulate_rep_nochange_stoch")
+  scenario=c("Full change", "No change"),
+  suffix=c("_stoch", "_nc_stoch"),
+  simulation=c("simulate_rep", "simulate_rep_nochange")
 )
 
 models <- c("Random walk priors"="sir_brw_erw",
@@ -62,6 +62,11 @@ fitdata <- lapply(1:nrow(scenarios), function(i) {
 }) %>%
   bind_rows() %>%
   mutate(scenario=factor(scenario, levels=scenarios$scenario))
+
+fitdata <- fitdata %>%
+  filter(
+    !(fit==5 & scenario=="Full change")
+  )
 
 truedata <- fitdata %>%
   distinct(scenario, parameter, x, true)
@@ -148,4 +153,4 @@ g5 <- ggplot(coverdata) +
 
 gcomb <- ggarrange(g1, g2, g3, g4, g5, ncol=1, labels=c("A", "B", "C", "D", "E"))
 
-ggsave("figure_rep_comb.pdf", gcomb, width=10, height=8)
+ggsave("figure_stanfit_rep_stoch.pdf", gcomb, width=10, height=8)
