@@ -120,19 +120,26 @@ betadata <- lapply(all_summ, function(x) {
                           "1730-1749",
                           "1750-1769",
                           "1770-1796"))
-  ) %>%
+  )
+
+betadata2 <- bind_rows(
+  betadata %>% mutate(week=week-52),
+  betadata,
+  betadata %>% mutate(week=week+52)
+) %>%
   group_by(group, group_y) %>%
   arrange(group, group_y, week) %>%
   mutate(
     est_roll=zoo::rollapply(est, 7, "mean", partial=TRUE)
-  )
+  ) %>%
+  filter(week %in% 1:52)
 
 g3 <- ggplot(betadata) +
   geom_errorbar(aes(week, ymin=lwr, ymax=upr, col=group), width=0, linewidth=0.2,
                 position = position_dodge(width=1), alpha=0.5) +
   geom_point(aes(week, est, col=group), size=0.5,
              position = position_dodge(width=1)) +
-  geom_line(aes(week, est_roll, col=group), lwd=1) +
+  geom_line(data=betadata2, aes(week, est_roll, col=group), lwd=1) +
   scale_x_continuous("Week of year", expand=c(0, 0),
                      breaks=c(1,11, 21, 31, 41, 51)) +
   scale_y_continuous("Smoothed\ntransmission rate\n(1/week)", expand=c(0, 0)) +
