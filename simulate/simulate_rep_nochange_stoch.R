@@ -34,9 +34,9 @@ for (i in 1:nsim) {
     data.frame(
       week=data_filter$week,
       year=data_filter$year-1669,
-      brate=data_filter$birth/data_filter$population,
-      drate=data_filter$death/data_filter$population,
-      pop=data_filter$population,
+      brate=ss$birthvec/ss$popvec,
+      drate=ss$deathvec/ss$popvec,
+      pop=ss$popvec,
       S=ss$S,
       I=ss$I,
       cases=ss$cases
