@@ -3,9 +3,16 @@ library(ggplot2); theme_set(theme_bw(base_family = "Times"))
 library(egg)
 source("../R/colors.R")
 
-simulation_env <- new.env()
-load("../simulate/simulate_rep_nochange_stoch.rda", envir=simulation_env)
-simulations <- simulation_env$simulate_rep_nochange_stoch
+scenarios <- data.frame(
+  scenario=c("No change"),
+  suffix=c("_nc_stoch"),
+  simulation=c("simulate_rep_nochange_stoch")
+)
+
+models <- c("Random walk priors"="sir_brw_erw",
+            "Independent priors"="sir_default")
+groups <- names(models)
+cols <- setNames(colors_default[c(1,3)], sort(groups))
 
 get_summary <- function(dd, variable, time, true, trans=identity) {
   dd <- dd[match(paste0(variable, "[", seq_along(true), "]"), dd$variable), ]
@@ -16,41 +23,53 @@ get_summary <- function(dd, variable, time, true, trans=identity) {
   )
 }
 
-fitdata <- lapply(seq_along(simulations), function(i) {
-  message("Stochastic simulation: replicate ", i)
-  sim <- simulations[[i]]
-  dat <- sim[[1]]
-  year <- dat$year+1669
-  week <- dat$week
+read_scenario <- function(suffix, simulation, scenario) {
+  env <- new.env()
+  load(paste0("../simulate/", simulation, ".rda"), envir=env)
+  simulations <- env[[simulation]]
+  
+  lapply(seq_along(groups), function(j) {
+    model <- models[[j]]
+    lapply(seq_along(simulations), function(i) {
+      message(scenario, ": ", groups[j], ", replicate ", i)
+      sim <- simulations[[i]]
+      year <- sim[[1]]$year+1669
+      week <- sim[[1]]$week
+      # Keep only extracted summaries, rather than retaining all fit objects.
+      env <- new.env()
+      load(paste0("../stanfit_", model, "_rep", suffix,
+                  "/stanfit_", model, "_rep", suffix, i, ".rda"),
+           envir=env)
+      dd <- env[[paste0("summary_", model, "_laplace_rep", suffix, i)]]
+      stopifnot(!is.null(dd))
+      
+      bind_rows(
+        beta=get_summary(dd, "logbeta", data.frame(x=1:52),
+                         exp(sim$logbeta), exp),
+        epsilon=get_summary(dd, "epsilon", data.frame(x=unique(year)),
+                            exp(sim$epsilon), exp),
+        beff=get_summary(dd, "beta_eff", data.frame(x=year+week/52, year=year),
+                         exp(sim$logbeta[week]+sim$epsilon[sim[[1]]$year])),
+        .id="parameter"
+      ) %>%
+        mutate(scenario=scenario, group=groups[j], fit=i)
+    }) %>% bind_rows()
+  }) %>% bind_rows()
+}
 
-  # Retain summaries only, rather than all ten large fit objects.
-  fit_env <- new.env()
-  load(paste0("../stanfit_sir_default_rep_nc_stoch/",
-              "stanfit_sir_default_rep_nc_stoch", i, ".rda"),
-       envir=fit_env)
-  dd <- fit_env[[paste0("summary_sir_default_laplace_rep_nc_stoch", i)]]
-  stopifnot(!is.null(dd))
-
-  bind_rows(
-    beta=get_summary(dd, "logbeta", data.frame(x=seq_along(sim$logbeta)),
-                     exp(sim$logbeta), exp),
-    epsilon=get_summary(dd, "epsilon", data.frame(x=unique(year)),
-                        exp(sim$epsilon), exp),
-    beff=get_summary(dd, "beta_eff", data.frame(x=year+week/52, year=year),
-                     exp(sim$logbeta[week]+sim$epsilon[dat$year])),
-    .id="parameter"
-  ) %>%
-    mutate(fit=i)
+fitdata <- lapply(1:nrow(scenarios), function(i) {
+  with(scenarios[i, ], read_scenario(suffix, simulation, scenario))
 }) %>%
-  bind_rows()
+  bind_rows() %>%
+  mutate(scenario=factor(scenario, levels=scenarios$scenario))
 
 truedata <- fitdata %>%
-  distinct(parameter, x, true)
+  distinct(scenario, parameter, x, true)
 
 coverdata <- fitdata %>%
   filter(parameter=="beff") %>%
   mutate(bias=(est-true)/true, covered=lwr <= true & true <= upr) %>%
-  group_by(year) %>%
+  group_by(scenario, group, year) %>%
   summarize(
     bias_lwr=t.test(bias)$conf.int[1],
     bias_upr=t.test(bias)$conf.int[2],
@@ -63,26 +82,29 @@ coverdata <- fitdata %>%
   )
 
 covermean <- coverdata %>%
-  summarize(bias=mean(bias), coverage=mean(coverage))
+  group_by(scenario, group) %>%
+  summarize(bias=mean(bias), coverage=mean(coverage), .groups="drop")
 
-cols <- c("Independent priors"=colors_default[1], "Simulated truth"="black")
-
+# Each plot is one row, with the two scenarios as columns.
 common <- list(
+  facet_wrap(~scenario, nrow=1, scales="free_y"),
   scale_color_manual("", values=cols),
   theme(
     panel.grid=element_blank(),
     panel.border=element_rect(linewidth=1),
+    panel.spacing.x=grid::unit(0.4, "in"),
     axis.title.x=element_blank(),
+    strip.background=element_blank(),
+    strip.text=element_blank(),
     legend.position="none"
   )
 )
 
 plot_fit <- function(parameter_name) {
   ggplot(filter(fitdata, parameter==parameter_name)) +
-    geom_line(aes(x, est, group=fit, col="Independent priors"),
-              linewidth=0.4, alpha=0.7) +
+    geom_line(aes(x, est, group=interaction(fit, group), col=group)) +
     geom_line(data=filter(truedata, parameter==parameter_name),
-              aes(x, true, col="Simulated truth"), linewidth=0.5) +
+              aes(x, true)) +
     common
 }
 
@@ -90,39 +112,40 @@ g1 <- plot_fit("beta") +
   scale_x_continuous("Week of year", expand=c(0, 0),
                      breaks=c(1, 11, 21, 31, 41, 51),
                      labels=c("Wk 1", "Wk 11", "Wk 21", "Wk 31", "Wk 41", "Wk 51")) +
-  scale_y_continuous("Seasonal\ntransmission rate\n(1/week)") +
-  guides(color=guide_legend(override.aes=list(alpha=1, linewidth=0.8))) +
-  theme(legend.position="top")
+  scale_y_continuous("Seasonal\ntransmission rate\n(1/week)",
+                     limits=c(1.17, 2.35), expand=c(0, 0)) +
+  theme(strip.text=element_text(), legend.position="top")
 
 g2 <- plot_fit("epsilon") +
+  geom_hline(yintercept=1, lty=2) +
   scale_x_continuous("Year", expand=c(0, 0)) +
   scale_y_log10("Multiplicative\nchanges in\ntransmission",
-                breaks=c(0.125, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 4, 8, 16),
-                labels=c("1/8", "1/4", "1/2", "3/4", "1", "1.25", "1.5", "2", "4", "8", "16"))
+                breaks=c(0.5, 1, 2, 4),
+                labels=c("1/2", "1", "2", "4"), limits=c(0.5, 4)) 
 
 g3 <- plot_fit("beff") +
   scale_x_continuous("Year", expand=c(0, 0)) +
-  scale_y_log10("Effective\ntransmission rate\n(1/week)")
+  scale_y_log10("Transmission rate\n(1/week)", 
+                breaks=c(1, 2, 4, 8),
+                limits=c(0.8, 10))
 
 g4 <- ggplot(coverdata) +
+  geom_point(aes(year, bias, col=group), size=0.5) +
+  geom_errorbar(aes(year, ymin=bias_lwr, ymax=bias_upr, col=group), width=0) +
   geom_hline(yintercept=0, lty=2) +
-  geom_hline(data=covermean, aes(yintercept=bias, col="Independent priors"), lty=3) +
-  geom_errorbar(aes(year, ymin=bias_lwr, ymax=bias_upr, col="Independent priors"), width=0) +
-  geom_point(aes(year, bias, col="Independent priors"), size=0.5) +
+  geom_hline(data=covermean, aes(yintercept=bias, col=group), lty=3) +
   scale_x_continuous("Year", expand=c(0, 0)) +
-  scale_y_continuous("Relative bias") +
+  scale_y_continuous("Relative bias", limits=c(-0.18, 0.35)) +
   common
 
 g5 <- ggplot(coverdata) +
+  geom_point(aes(year, coverage, col=group), size=0.5) +
   geom_hline(yintercept=0.9, lty=2) +
-  geom_hline(data=covermean, aes(yintercept=coverage, col="Independent priors"), lty=3) +
-  geom_errorbar(aes(year, ymin=lwr, ymax=upr, col="Independent priors"), width=0) +
-  geom_point(aes(year, coverage, col="Independent priors"), size=0.5) +
+  geom_hline(data=covermean, aes(yintercept=coverage, col=group), lty=3) +
   scale_x_continuous("Year", expand=c(0, 0)) +
   scale_y_continuous("Coverage", limits=c(0, 1)) +
-  common +
-  theme(axis.title.x=element_text())
+  common
 
 gcomb <- ggarrange(g1, g2, g3, g4, g5, ncol=1, labels=c("A", "B", "C", "D", "E"))
 
-ggsave("figure_stanfit_rep_stoch.pdf", gcomb, width=5.5, height=9)
+ggsave("figure_rep_comb.pdf", gcomb, width=10, height=8)
