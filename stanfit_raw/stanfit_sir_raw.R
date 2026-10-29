@@ -3,7 +3,7 @@ library(cmdstanr)
 source("../script/script_data.R")
 
 data_filter <- data_final %>%
-  filter(year < 1796)
+  filter(year < 1680)
 
 model <- cmdstan_model("../stanmodel/sir_raw.stan")
 
@@ -20,7 +20,7 @@ standata <- list(
   gamma=-log(1-1/3)
 )
 
-nfit <- 400
+nfit <- 100
 ncores <- 8
 
 t0 <- Sys.time()
@@ -53,12 +53,13 @@ if (!length(reslist)) stop("All optimization attempts failed")
 stanfit_sir_raw_optim <- reslist %>%
   bind_rows
 
-plot(stanfit_sir_raw_optim$value, ylim=c(-28252, -28250))
+plot(stanfit_sir_raw_optim$value)
 
 oo_final <- model$optimize(data=standata,
                            seed=stanfit_sir_raw_optim$seed[which.max(stanfit_sir_raw_optim$value)],
                            jacobian = TRUE,
-                           show_messages = FALSE) 
+                           show_messages = FALSE,
+                           iter=1e4) 
 
 stanfit_sir_raw_laplace <- 
   model$laplace(data = standata, mode = oo_final)
@@ -76,11 +77,10 @@ save("stanfit_sir_raw_optim",
 
 dd <- oo_final$draws()
 
-plot(data_filter$smpx)
+plot(data_filter$smpx, type="l")
 lines(dd[grepl("C\\[", colnames(dd))], col=2)
 
-dd[grepl("sigma", colnames(dd))]
-dd[grepl("sigma_epsilon", colnames(dd))]
+dd[grepl("omega", colnames(dd))]
 
 plot((dd[grepl("logbeta\\[", colnames(dd))]), type="l")    
 
