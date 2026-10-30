@@ -3,6 +3,7 @@ library(ggplot2); theme_set(theme_bw(base_family = "Times"))
 library(egg)
 library(ggsci)
 library(cmdstanr)
+library(WaveletComp)
 source("../script/script_data.R")
 source("../R/colors.R")
 
@@ -47,6 +48,8 @@ rhodata <- lapply(all_summ, function(x) {
     .id="group"
   )
 
+colors_this <- c(colors_default[1], colors_new[1])
+
 g0 <- ggplot(rhodata) +
   geom_ribbon(aes(year+week/52, ymin=lwr, ymax=upr, fill=group), alpha=0.3) +
   geom_line(aes(year+week/52, est, col=group)) +
@@ -76,8 +79,6 @@ fitdata <- lapply(all_summ, function(x) {
   bind_rows(
     .id="group"
   )
-
-colors_this <- c(colors_default[1], colors_new[1])
 
 g1 <- ggplot(fitdata) +
   geom_vline(xintercept=c(1690, 1710, 1730, 1750, 1770), lty=3) +
@@ -217,8 +218,78 @@ g4 <- ggplot(epsilondata) +
     legend.position = "none"
   )
 
-gcomb <- ggarrange(g0, g1, g2, g3, g4, ncol=1,
-                   labels=c("A", "B", "C", "D", "E"),
+beffdata <- lapply(all_summ, function(x) {
+  data.frame(
+    year=data_filter$year,
+    week=data_filter$week,
+    birth=data_filter$birth,
+    death=data_filter$death,
+    pop=data_filter$population,
+    est=(x$median[grepl("^beta_eff\\[", x$variable)]),
+    lwr=(x$q5[grepl("^beta_eff\\[", x$variable)]),
+    upr=(x$q95[grepl("^beta_eff\\[", x$variable)])
+  )
+}) %>%
+  bind_rows(
+    .id="group"
+  )
+
+pop0 <- data_filter$population[1]
+q_remove <- 1/3
+
+period_data <- beffdata %>%
+  group_by(group, year) %>%
+  summarise(
+    beta_mean=mean(est*pop/pop0),
+    b=mean(birth/pop),
+    d=mean(death/pop)
+  ) %>%
+  mutate(
+    frequency_sq=b*beta_mean-d*q_remove,
+    period=2*pi/(52*sqrt(frequency_sq))
+  )
+
+data_filter2 <- data_filter %>%
+  mutate(
+    sqsm=sqrt(smpx)
+  )
+
+aa <- analyze.wavelet(data_filter2, "sqsm",
+                      dt=1/52,
+                      upperPeriod = 16,
+                      lowerPeriod = 0.5,
+                      loess.span = 0.9,
+                      make.pval = FALSE)
+
+obsperiod <- lapply(1:nrow(data_filter), function(x) {
+  data.frame(
+    year=data_filter$year[x],
+    week=data_filter$week[x],
+    period=sum(aa$Period*aa$Power[,x])/sum(aa$Power[,x])
+  )
+}) %>%
+  bind_rows %>%
+  group_by(year) %>%
+  mutate(
+    period=mean(period)
+  )
+
+g5 <- ggplot(period_data) +
+  geom_line(data=obsperiod, aes(year, period), lty=2) +
+  geom_line(aes(year, period, col=group), lwd=1) +
+  scale_x_continuous("Year", expand=c(0, 0)) +
+  scale_y_continuous("Intrinsic period (years)") +
+  scale_color_manual("Prior distribution", values=colors_this) +
+  scale_fill_manual("Prior distribution", values=colors_this) +
+  theme(
+    panel.grid = element_blank(),
+    panel.border = element_rect(linewidth=1),
+    axis.title.x = element_blank(),
+    legend.position = "none"
+  )
+
+gcomb <- ggarrange(g0, g1, g2, g3, g4, g5, ncol=1,
+                   labels=c("A", "B", "C", "D", "E","F"),
                    draw=FALSE)
 
-ggsave("figure_stanfit_sep_rho.pdf", gcomb, width=8, height=10)
+ggsave("figure_stanfit_sep_rho.pdf", gcomb, width=8, height=12)
